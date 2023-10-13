@@ -6,6 +6,7 @@ import os
 import logging
 import unittest
 from service.models import Customer, DataValidationError, db
+from service import app
 
 
 ######################################################################
@@ -18,6 +19,11 @@ class TestCustomer(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         """ This runs once before the entire test suite """
+        app.config["TESTING"] = True
+        app.config["DEBUG"] = False
+        app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URI
+        app.logger.setLevel(logging.CRITICAL)
+        Pet.init_db(app)
 
     @classmethod
     def tearDownClass(cls):
