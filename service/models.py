@@ -59,6 +59,8 @@ class Customer(db.Model):
         Updates a Customer to the database
         """
         logger.info("Saving %s", self.get_full_name())
+        if not self.id:
+            raise DataValidationError("Update called with empty ID field")
         db.session.commit()
 
     def delete(self):
@@ -96,7 +98,7 @@ class Customer(db.Model):
         except TypeError as error:
             raise DataValidationError(
                 "Invalid Customer: body of request contained bad or no data - "
-                + "Error message: " + error # FIXME
+                + "Error message: " + str(error)
             ) from error
         return self
 
