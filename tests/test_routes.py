@@ -1,5 +1,5 @@
 """
-TestYourResourceModel API Service Test Suite
+TestCustomerModel API Service Test Suite
 
 Test cases can be run with the following:
   nosetests -v --with-spec --spec-color
@@ -17,7 +17,7 @@ from service.common import status  # HTTP Status Codes
 #  T E S T   C A S E S
 ######################################################################
 # pylint: disable=too-many-public-methods
-class TestYourResourceServer(TestCase):
+class TestCustomerServer(TestCase):
     """ REST API Server Tests """
 
     @classmethod
