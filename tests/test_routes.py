@@ -12,6 +12,10 @@ from service import app
 from service.models import db
 from service.common import status  # HTTP Status Codes
 
+import json
+from tests.factories import CustomerFactory
+from service.models import Customer
+
 
 ######################################################################
 #  T E S T   C A S E S
@@ -43,3 +47,17 @@ class TestCustomerServer(TestCase):
         """ It should call the home page """
         resp = self.client.get("/")
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
+    def test_delete_customer(self):
+        """ It should delete the customer by id """
+
+        customer = CustomerFactory()
+        customer.create()
+        self.assertEqual(len(Customer.all()), 1)
+
+        response = self.client.delete(
+            "/customers/" + str(customer.id), 
+        )
+        # delete the customer and make sure it isn't in the database
+        self.assertEqual(len(Customer.all()), 0)
+
