@@ -43,3 +43,17 @@ def delete_customer(customer_id):
         customer.delete()
     app.logger.info("Customer with ID [%s] delete complete.", customer_id)
     return "", status.HTTP_204_NO_CONTENT
+
+@app.route("/customers/<int:customer_id>", methods=['GET'])
+def get_customer(customer_id):
+    """
+    Get a Customer
+
+    This endpoint will get a Customer information based the id specified in the path
+    """
+    customer = Customer.find(customer_id)
+    if not customer:
+        abort(status.HTTP_404_NOT_FOUND, f"Customer Id: '{customer_id}' was not found.")
+
+    app.logger.info("Customer with ID [%s] get.", customer_id)
+    return jsonify(customer.serialize()), status.HTTP_200_OK

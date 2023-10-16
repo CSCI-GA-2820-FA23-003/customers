@@ -18,6 +18,7 @@ from service.models import Customer
 
 BASE_URL = "/customers"
 
+from flask import jsonify
 
 ######################################################################
 #  T E S T   C A S E S
@@ -74,3 +75,47 @@ class TestCustomerServer(TestCase):
         response = self.client.get(f"{BASE_URL}/{test_customer.id}")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
+        
+        
+    def test_get_customer(self):
+        # """It should Read a Customer"""
+        # customer = CustomerFactory()
+        # logging.debug(customer)
+        # customer.id = None
+        # customer.create()
+        # self.assertIsNotNone(customer.id)
+        # # Fetch it back
+        # found_customer = Customer.find(customer.id)
+        # self.assertEqual(found_customer.id, customer.id)
+        # self.assertEqual(found_customer.first_name, customer.first_name)
+        # self.assertEqual(found_customer.last_name, customer.last_name)
+        # self.assertEqual(found_customer.email, customer.email)
+        # self.assertEqual(found_customer.address, customer.address)
+        
+        
+        # Create a test resource using the factory
+        customer = CustomerFactory()
+        
+        response = self.client.get(
+            "/customers/" + str(customer.id), 
+        )
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        
+        
+        customer.create()
+
+        # Send a GET request to retrieve the resource
+        response = self.client.get(
+            "/customers/" + str(customer.id), 
+        )
+        
+        
+        # Check if the response status code is 200 (OK)
+        self.assertEqual(response.status_code, 200)
+        customer = Customer.find(customer.id)
+        found_customer = response.get_json()
+
+        # Check if the returned JSON data matches the resource data
+        self.assertEqual(found_customer, customer.serialize())
+        
+        
