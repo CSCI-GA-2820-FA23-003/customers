@@ -29,3 +29,14 @@ def index():
 ######################################################################
 
 # Place your REST API code here ...
+
+@app.route("/customers/<int:customer_id>", methods=['DELETE'])
+def delete_customer(customer_id):
+    """
+    Delete a Customer
+
+    This endpoint will delete a Customer based the id specified in the path
+    """
+    customer = Customer.find(customer_id)
+    customer.delete()
+    return '', status.HTTP_200_OK
