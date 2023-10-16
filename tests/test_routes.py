@@ -43,6 +43,11 @@ class TestCustomerServer(TestCase):
     #  P L A C E   T E S T   C A S E S   H E R E
     ######################################################################
 
+    def test_index(self):
+        """ It should call the home page """
+        resp = self.client.get("/")
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
     def test_create_customer(self):
         """ Create a new Customer """
         # Arrange
