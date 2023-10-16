@@ -17,6 +17,9 @@ from tests.factories import CustomerFactory
 
 
 from service.models import Customer
+
+BASE_URL = "/customers"
+
 from flask import jsonify
 
 ######################################################################
@@ -40,6 +43,20 @@ class TestCustomerServer(TestCase):
 
     def tearDown(self):
         """ This runs after each test """
+        
+    def _create_customers(self, count):
+        """Factory method to create customers in bulk"""
+        customers = []
+        for _ in range(count):
+            test_customer = CustomerFactory()
+            response = self.client.post(BASE_URL, json=test_customer.serialize())
+            self.assertEqual(
+                response.status_code, status.HTTP_201_CREATED, "Could not create test customer"
+            )
+            new_customer = response.get_json()
+            test_customer.id = new_customer["id"]
+            customers.append(test_customer)
+        return customers
 
     ######################################################################
     #  P L A C E   T E S T   C A S E S   H E R E
@@ -49,6 +66,17 @@ class TestCustomerServer(TestCase):
         """ It should call the home page """
         resp = self.client.get("/")
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
+    def test_delete_customer(self):
+        """It should Delete a Customer"""
+        test_customer = self._create_customers(1)[0]
+        response = self.client.delete(f"{BASE_URL}/{test_customer.id}")
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(len(response.data), 0)
+        # make sure they are deleted
+        response = self.client.get(f"{BASE_URL}/{test_customer.id}")
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
 
     def test_create_customer(self):
         """ Create a new Customer """
