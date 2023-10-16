@@ -54,20 +54,6 @@ class TestCustomerServer(TestCase):
         """ Create a new Customer """
         # Arrange
 
-
-        # customer = CustomerFactory()
-        # logging.debug(customer)
-        # customer.id = None
-        # customer.create()
-        # self.assertIsNotNone(customer.id)
-        # # Fetch it back
-        # found_customer = Customer.find(customer.id)
-        # self.assertEqual(found_customer.id, customer.id)
-        # self.assertEqual(found_customer.first_name, customer.first_name)
-        # self.assertEqual(found_customer.last_name, customer.last_name)
-        # self.assertEqual(found_customer.email, customer.email)
-        # self.assertEqual(found_customer.address, customer.address)
-
         fake_customer = CustomerFactory()
         data = json.dumps({
             "id": fake_customer.id,
@@ -94,6 +80,49 @@ class TestCustomerServer(TestCase):
         self.assertEqual(new_json["email"], fake_customer.email)
         self.assertEqual(new_json["address"], fake_customer.address)
 
+    def test_create_customer_wrong_field(self):
+        """ Create a new Customer with wrong field """
+        # Arrange
+
+        fake_customer = CustomerFactory()
+        data = json.dumps({
+            "id": fake_customer.id,
+            "firstName": fake_customer.first_name,
+            "lastName": fake_customer.last_name,
+            "email": fake_customer.email,
+            "address": fake_customer.address
+        })
+
+        # Action
+        response = self.client.post(
+            "/customers", 
+            data=data,
+            content_type="application/json"
+        )
+        
+        # Check the data is correct
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+
+    def test_create_customer_no_json(self):
+        """ Create a new Customer with no JSON data """
+        # Arrange
+        fake_customer = CustomerFactory()
+
+        # Convert the data to a string instead of JSON
+        data = json.dumps({
+        })
+
+        # Action
+        response = self.client.post(
+            "/customers", 
+            data=data,
+            content_type="application/json"
+        )
+
+        # Assert
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        
     def test_create_customer_not_json(self):
         """ Create a new Customer with non-JSON data """
         # Arrange
@@ -116,7 +145,32 @@ class TestCustomerServer(TestCase):
         )
 
         # Assert
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)  # Expect a 400 error
+        self.assertEqual(response.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
+        
+
+    def test_create_customer_no_type(self):
+        """ Create a new Customer with no content_type"""
+        # Arrange
+        fake_customer = CustomerFactory()
+
+        # Convert the data to a string instead of JSON
+        data = str({
+            "id": fake_customer.id,
+            "first_name": fake_customer.first_name,
+            "last_name": fake_customer.last_name,
+            "email": fake_customer.email,
+            "address": fake_customer.address
+        })
+
+        # Action
+        response = self.client.post(
+            "/customers", 
+            data=data,
+            # Send as no type instead of JSON
+        )
+
+        # Assert
+        self.assertEqual(response.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)  # Expect a 400 error
 
     def test_create_customer_missing_field(self):
         """ Create a new Customer with missing fields """
