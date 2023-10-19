@@ -2,13 +2,13 @@
 Test cases for Customer Model
 
 """
-import os
+# import os
 import logging
 import unittest
+
 from service.models import Customer, DataValidationError, db
-from service import app
+from service import app, config
 from tests.factories import CustomerFactory
-from service import config
 
 
 ######################################################################
@@ -16,11 +16,11 @@ from service import config
 ######################################################################
 # pylint: disable=too-many-public-methods
 class TestCustomer(unittest.TestCase):
-    """ Test Cases for Customer Model """
+    """Test Cases for Customer Model"""
 
     @classmethod
     def setUpClass(cls):
-        """ This runs once before the entire test suite """
+        """This runs once before the entire test suite"""
         app.config["TESTING"] = True
         app.config["DEBUG"] = False
         app.config["SQLALCHEMY_DATABASE_URI"] = config.DATABASE_URI
@@ -29,16 +29,16 @@ class TestCustomer(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        """ This runs once after the entire test suite """
+        """This runs once after the entire test suite"""
         db.session.close()
 
     def setUp(self):
-        """ This runs before each test """
+        """This runs before each test"""
         db.session.query(Customer).delete()  # clean up the last tests
         db.session.commit()
 
     def tearDown(self):
-        """ This runs after each test """
+        """This runs after each test"""
         db.session.remove()
 
     ######################################################################
@@ -47,20 +47,32 @@ class TestCustomer(unittest.TestCase):
 
     def test_create_a_customer(self):
         """It should Create a customer and assert that it exists"""
-        customer = Customer(first_name="Jorge", last_name="Wagner", email="jwagner@example.com", address="778 Brown Plaza\nNorth Jenniferfurt, VT 88077")
+        customer = Customer(
+            first_name="Jorge",
+            last_name="Wagner",
+            email="jwagner@example.com",
+            address="778 Brown Plaza\nNorth Jenniferfurt, VT 88077",
+        )
         self.assertTrue(customer is not None)
         self.assertEqual(customer.id, None)
         self.assertEqual(str(customer), "<Customer Jorge Wagner id=[None]>")
         self.assertEqual(customer.first_name, "Jorge")
         self.assertEqual(customer.last_name, "Wagner")
         self.assertEqual(customer.email, "jwagner@example.com")
-        self.assertEqual(customer.address, "778 Brown Plaza\nNorth Jenniferfurt, VT 88077")
+        self.assertEqual(
+            customer.address, "778 Brown Plaza\nNorth Jenniferfurt, VT 88077"
+        )
 
     def test_add_a_customer(self):
         """It should Create a customer and add it to the database"""
         customers = Customer.all()
         self.assertEqual(customers, [])
-        customer = Customer(first_name="Jorge", last_name="Wagner", email="jwagner@example.com", address="778 Brown Plaza\nNorth Jenniferfurt, VT 88077")
+        customer = Customer(
+            first_name="Jorge",
+            last_name="Wagner",
+            email="jwagner@example.com",
+            address="778 Brown Plaza\nNorth Jenniferfurt, VT 88077",
+        )
         self.assertTrue(customer is not None)
         self.assertEqual(customer.id, None)
         customer.create()
@@ -163,7 +175,12 @@ class TestCustomer(unittest.TestCase):
 
     def test_deserialize_missing_data(self):
         """It should not deserialize a Customer with missing data"""
-        data = {"id": 1, "first_name": "Vanessa", "email": "vanessa3@yahoo.com", "address": "3513 John Divide Suite 115\nRodriguezside, LA 93111"}
+        data = {
+            "id": 1,
+            "first_name": "Vanessa",
+            "email": "vanessa3@yahoo.com",
+            "address": "3513 John Divide Suite 115\nRodriguezside, LA 93111",
+        }
         customer = Customer()
         self.assertRaises(DataValidationError, customer.deserialize, data)
 
@@ -196,7 +213,13 @@ class TestCustomer(unittest.TestCase):
         for customer in customers:
             customer.create()
         full_name = customers[0].get_full_name()
-        count = len([customer for customer in customers if customer.get_full_name() == full_name])
+        count = len(
+            [
+                customer
+                for customer in customers
+                if customer.get_full_name() == full_name
+            ]
+        )
         found = Customer.find_by_full_name(full_name)
         self.assertEqual(found.count(), count)
         for customer in found:

@@ -14,12 +14,12 @@ db = SQLAlchemy()
 
 # Function to initialize the database
 def init_db(app):
-    """ Initializes the SQLAlchemy app """
+    """Initializes the SQLAlchemy app"""
     Customer.init_db(app)
 
 
 class DataValidationError(Exception):
-    """ Used for an data validation errors when deserializing """
+    """Used for an data validation errors when deserializing"""
 
 
 class Customer(db.Model):
@@ -38,7 +38,7 @@ class Customer(db.Model):
 
     def __repr__(self):
         return f"<Customer {self.get_full_name()} id=[{self.id}]>"
-    
+
     def get_full_name(self):
         """
         Returns the Customer's full name
@@ -64,19 +64,19 @@ class Customer(db.Model):
         db.session.commit()
 
     def delete(self):
-        """ Removes a Customer from the data store """
+        """Removes a Customer from the data store"""
         logger.info("Deleting %s", self.get_full_name())
         db.session.delete(self)
         db.session.commit()
 
     def serialize(self):
-        """ Serializes a Customer into a dictionary """
+        """Serializes a Customer into a dictionary"""
         return {
             "id": self.id,
             "first_name": self.first_name,
             "last_name": self.last_name,
             "email": self.email,
-            "address": self.address
+            "address": self.address,
         }
 
     def deserialize(self, data):
@@ -98,13 +98,14 @@ class Customer(db.Model):
         except TypeError as error:
             raise DataValidationError(
                 "Invalid Customer: body of request contained bad or no data - "
-                + "Error message: " + str(error)
+                + "Error message: "
+                + str(error)
             ) from error
         return self
 
     @classmethod
     def init_db(cls, app):
-        """ Initializes the database session """
+        """Initializes the database session"""
         logger.info("Initializing database")
         cls.app = app
         # This is where we initialize SQLAlchemy from the Flask app
@@ -114,13 +115,13 @@ class Customer(db.Model):
 
     @classmethod
     def all(cls):
-        """ Returns all of the Customers in the database """
+        """Returns all of the Customers in the database"""
         logger.info("Processing all Customers")
         return cls.query.all()
 
     @classmethod
     def find(cls, by_id):
-        """ Finds a Customer by it's ID """
+        """Finds a Customer by it's ID"""
         logger.info("Processing lookup for id %s ...", by_id)
         return cls.query.get(by_id)
 
@@ -133,4 +134,6 @@ class Customer(db.Model):
         """
         logger.info("Processing name query for %s ...", full_name)
         name_parts = full_name.split(" ", 1)
-        return cls.query.filter(cls.first_name == name_parts[0], cls.last_name == name_parts[1])
+        return cls.query.filter(
+            cls.first_name == name_parts[0], cls.last_name == name_parts[1]
+        )

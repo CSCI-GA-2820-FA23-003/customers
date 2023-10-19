@@ -5,29 +5,20 @@ Test cases can be run with the following:
   nosetests -v --with-spec --spec-color
   coverage report -m
 """
-import os
+# import os
 import logging
 from unittest import TestCase
-from service import app
+import json
+
+# from flask import url_for
+# from flask import jsonify
+
+from service import app, config
 from service.models import db, init_db, Customer
 from service.common import status  # HTTP Status Codes
-
-from flask import url_for
-
-from tests.factories import CustomerFactory
-from service import config
-
-BASE_URL = "/customers"
-
-import json
 from tests.factories import CustomerFactory
 
-
-from service.models import Customer
-
 BASE_URL = "/customers"
-
-from flask import jsonify
 
 
 ######################################################################
@@ -61,7 +52,6 @@ class TestCustomerServer(TestCase):
         db.session.commit()
 
     def tearDown(self):
-
         """This runs after each test"""
         db.session.remove()
 
@@ -86,7 +76,6 @@ class TestCustomerServer(TestCase):
     ######################################################################
 
     def test_index(self):
-
         """It should call the home page"""
         response = self.client.get("/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -106,7 +95,6 @@ class TestCustomerServer(TestCase):
     def test_create_customer(self):
         """Create a new Customer"""
         # Arrange
-
         fake_customer = CustomerFactory()
         data = json.dumps(
             {
@@ -136,7 +124,6 @@ class TestCustomerServer(TestCase):
     def test_create_customer_wrong_field(self):
         """Create a new Customer with wrong field"""
         # Arrange
-
         fake_customer = CustomerFactory()
         data = json.dumps(
             {
@@ -158,8 +145,6 @@ class TestCustomerServer(TestCase):
 
     def test_create_customer_no_json(self):
         """Create a new Customer with no JSON data"""
-        # Arrange
-        fake_customer = CustomerFactory()
 
         # Convert the data to a string instead of JSON
         data = json.dumps({})
@@ -261,7 +246,7 @@ class TestCustomerServer(TestCase):
             self.assertEqual(error_json["error"], "Invalid Customer: missing " + key)
 
     def test_get_customer(self):
-        # """It should Read a Customer"""
+        """It should Read a Customer"""
         # customer = CustomerFactory()
         # logging.debug(customer)
         # customer.id = None
@@ -317,7 +302,6 @@ class TestCustomerServer(TestCase):
 
     def test_update_customer(self):
         """Test updating a customer"""
-
         original_customer = self._create_customers(1)[0]
         updated_customer = CustomerFactory()
 
@@ -334,3 +318,17 @@ class TestCustomerServer(TestCase):
         self.assertEqual(updated_customer_data["last_name"], updated_customer.last_name)
         self.assertEqual(updated_customer_data["email"], updated_customer.email)
         self.assertEqual(updated_customer_data["address"], updated_customer.address)
+
+    def test_method_not_supported(self):
+        """It should return a HTTP_405_METHOD_NOT_ALLOWED when an unsupported method is called on an endpoint"""
+        response = self.client.post("/")
+        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+        response = self.client.put("/")
+        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+        response = self.client.delete("/")
+        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
+        response = self.client.put(BASE_URL)
+        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+        response = self.client.delete(BASE_URL)
+        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)

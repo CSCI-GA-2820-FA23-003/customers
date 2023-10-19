@@ -23,7 +23,7 @@ def index():
         jsonify(
             name="Customer REST API Service",
             version="1.0",
-            paths="/customers",  # url_for("list_customers", _external=True)
+            paths=url_for("list_customers", _external=True),
         ),
         status.HTTP_200_OK,
     )
@@ -32,10 +32,7 @@ def index():
 ######################################################################
 #  R E S T   A P I   E N D P O I N T S
 ######################################################################
-
-# Place your REST API code here ...
-
-@app.route("/customers/<int:customer_id>", methods=['DELETE'])
+@app.route("/customers/<int:customer_id>", methods=["DELETE"])
 def delete_customer(customer_id):
     """
     Delete a Customer
@@ -49,6 +46,7 @@ def delete_customer(customer_id):
     app.logger.info("Customer with ID [%s] delete complete.", customer_id)
     return "", status.HTTP_204_NO_CONTENT
 
+
 @app.route("/customers", methods=["POST"])
 def create_customer():
     """
@@ -59,31 +57,36 @@ def create_customer():
     # Ensure the request contains JSON data
     app.logger.info("Request to create a customer")
     check_content_type("application/json")
-    
+
     # Get the JSON data from the request
     data = request.get_json()
-    
+
     # # Ensure all required fields are in the data
     # required_fields = ["first_name", "last_name", "email", "address"]
     # for field in required_fields:
     #     if field not in data:
     #         return jsonify({"error": f"'{field}' is a required field"}), status.HTTP_400_BAD_REQUEST
-    
+
     # Create a new Customer with the data
     try:
         customer = Customer()
         customer.deserialize(data)
-        customer.create()        
+        customer.create()
     except DataValidationError as error:
         return jsonify({"error": str(error)}), status.HTTP_400_BAD_REQUEST
-    
+
     location_url = url_for("get_customer", customer_id=customer.id, _external=True)
     app.logger.info("Customer with ID [%s] created.", customer.id)
-    
-    # Return the new Customer as JSON
-    return jsonify(customer.serialize()), status.HTTP_201_CREATED, {"Location": location_url}
 
-@app.route("/customers/<int:customer_id>", methods=['GET'])
+    # Return the new Customer as JSON
+    return (
+        jsonify(customer.serialize()),
+        status.HTTP_201_CREATED,
+        {"Location": location_url},
+    )
+
+
+@app.route("/customers/<int:customer_id>", methods=["GET"])
 def get_customer(customer_id):
     """
     Get a Customer
@@ -97,7 +100,8 @@ def get_customer(customer_id):
     app.logger.info("Customer with ID [%s] get.", customer_id)
     return jsonify(customer.serialize()), status.HTTP_200_OK
 
-@app.route("/customers", methods=['GET'])
+
+@app.route("/customers", methods=["GET"])
 def list_customers():
     """
     List all Customers
@@ -108,7 +112,8 @@ def list_customers():
     customers = Customer.all()
     return jsonify([customer.serialize() for customer in customers]), status.HTTP_200_OK
 
-@app.route("/customers/<int:customer_id>", methods=['PUT'])
+
+@app.route("/customers/<int:customer_id>", methods=["PUT"])
 def update_customer(customer_id):
     """
     Update a Customer
@@ -125,13 +130,25 @@ def update_customer(customer_id):
 
     updated_data = request.get_json()
 
-    app.logger.info("Updating customer with ID [%s]. New data: %s", customer_id, json.dumps(updated_data, indent=2))
+    app.logger.info(
+        "Updating customer with ID [%s]. New data: %s",
+        customer_id,
+        json.dumps(updated_data, indent=2),
+    )
 
     existing_customer.deserialize(updated_data)
     existing_customer.update()
 
     app.logger.info("Customer with ID [%s] updated.", customer_id)
     return jsonify(existing_customer.serialize()), status.HTTP_200_OK
+
+
+@app.route("/", methods=["POST", "PUT", "DELETE"])
+@app.route("/customers", methods=["PUT", "DELETE"])
+def handle_method_not_supported():
+    """Handle invalid HTTP method used on an endpoint"""
+    abort(status.HTTP_405_METHOD_NOT_ALLOWED)
+
 
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S
