@@ -61,7 +61,6 @@ class TestCustomerServer(TestCase):
         db.session.commit()
 
     def tearDown(self):
-
         """This runs after each test"""
         db.session.remove()
 
@@ -86,7 +85,6 @@ class TestCustomerServer(TestCase):
     ######################################################################
 
     def test_index(self):
-
         """It should call the home page"""
         response = self.client.get("/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -334,3 +332,17 @@ class TestCustomerServer(TestCase):
         self.assertEqual(updated_customer_data["last_name"], updated_customer.last_name)
         self.assertEqual(updated_customer_data["email"], updated_customer.email)
         self.assertEqual(updated_customer_data["address"], updated_customer.address)
+
+    def test_method_not_supported(self):
+        """It should return a HTTP_405_METHOD_NOT_ALLOWED when an unsupported method is called on an endpoint"""
+        response = self.client.post("/")
+        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+        response = self.client.put("/")
+        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+        response = self.client.delete("/")
+        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
+        response = self.client.put(BASE_URL)
+        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+        response = self.client.delete(BASE_URL)
+        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
