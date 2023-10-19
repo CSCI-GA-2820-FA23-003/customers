@@ -16,6 +16,14 @@ This project template contains starter code for your class project. The `/servic
 ### Create a new customer
 
 * `POST /customers`
+* Parameters:
+  
+  | Parameter name | Type | Required |
+  | ----------- | ----------- | --------- |
+  | first_name | String | Yes |
+  | last_name | String | Yes |
+  | email | String | Yes |
+  | address | String | Yes |
 
 ### Retrieve a customer
 
@@ -24,6 +32,14 @@ This project template contains starter code for your class project. The `/servic
 ### Update a customer
 
 * `PUT /customers/{customer_id}`
+* Parameters:
+  
+  | Parameter name | Type | Required |
+  | ----------- | ----------- | --------- |
+  | first_name | String | Yes |
+  | last_name | String | Yes |
+  | email | String | Yes |
+  | address | String | Yes |
 
 ### Delete a customer
 
