@@ -95,7 +95,6 @@ class TestCustomerServer(TestCase):
     def test_create_customer(self):
         """Create a new Customer"""
         # Arrange
-
         fake_customer = CustomerFactory()
         data = json.dumps(
             {
@@ -125,7 +124,6 @@ class TestCustomerServer(TestCase):
     def test_create_customer_wrong_field(self):
         """Create a new Customer with wrong field"""
         # Arrange
-
         fake_customer = CustomerFactory()
         data = json.dumps(
             {
@@ -304,7 +302,6 @@ class TestCustomerServer(TestCase):
 
     def test_update_customer(self):
         """Test updating a customer"""
-
         original_customer = self._create_customers(1)[0]
         updated_customer = CustomerFactory()
 
