@@ -4,7 +4,7 @@ My Service
 Describe what your service does here
 """
 
-from flask import jsonify, request, url_for, abort
+from flask import jsonify, request, url_for, abort, json
 from service.common import status  # HTTP Status Codes
 from service.models import Customer, DataValidationError
 
@@ -92,6 +92,41 @@ def get_customer(customer_id):
     app.logger.info("Customer with ID [%s] get.", customer_id)
     return jsonify(customer.serialize()), status.HTTP_200_OK
 
+@app.route("/customers", methods=['GET'])
+def list_customers():
+    """
+    List all Customers
+
+    This endpoint will retrieve and return a list of all customers
+    """
+    app.logger.info("Request to list all customers")
+    customers = Customer.all()
+    return jsonify([customer.serialize() for customer in customers]), status.HTTP_200_OK
+
+@app.route("/customers/<int:customer_id>", methods=['PUT'])
+def update_customer(customer_id):
+    """
+    Update a Customer
+
+    This endpoint will update a Customer based on the data in the body that is put
+    """
+    app.logger.info("Request to update customer with id: %s", customer_id)
+
+    check_content_type("application/json")
+
+    existing_customer = Customer.find(customer_id)
+    if not existing_customer:
+        abort(status.HTTP_404_NOT_FOUND, f"Customer Id: '{customer_id}' was not found.")
+
+    updated_data = request.get_json()
+
+    app.logger.info("Updating customer with ID [%s]. New data: %s", customer_id, json.dumps(updated_data, indent=2))
+
+    existing_customer.deserialize(updated_data)
+    existing_customer.update()
+
+    app.logger.info("Customer with ID [%s] updated.", customer_id)
+    return jsonify(existing_customer.serialize()), status.HTTP_200_OK
 
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S
