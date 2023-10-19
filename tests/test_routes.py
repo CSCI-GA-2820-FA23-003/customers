@@ -5,29 +5,20 @@ Test cases can be run with the following:
   nosetests -v --with-spec --spec-color
   coverage report -m
 """
-import os
+# import os
 import logging
 from unittest import TestCase
-from service import app
+import json
+
+# from flask import url_for
+# from flask import jsonify
+
+from service import app, config
 from service.models import db, init_db, Customer
 from service.common import status  # HTTP Status Codes
-
-from flask import url_for
-
-from tests.factories import CustomerFactory
-from service import config
-
-BASE_URL = "/customers"
-
-import json
 from tests.factories import CustomerFactory
 
-
-from service.models import Customer
-
 BASE_URL = "/customers"
-
-from flask import jsonify
 
 
 ######################################################################
@@ -156,8 +147,6 @@ class TestCustomerServer(TestCase):
 
     def test_create_customer_no_json(self):
         """Create a new Customer with no JSON data"""
-        # Arrange
-        fake_customer = CustomerFactory()
 
         # Convert the data to a string instead of JSON
         data = json.dumps({})
@@ -259,7 +248,7 @@ class TestCustomerServer(TestCase):
             self.assertEqual(error_json["error"], "Invalid Customer: missing " + key)
 
     def test_get_customer(self):
-        # """It should Read a Customer"""
+        """It should Read a Customer"""
         # customer = CustomerFactory()
         # logging.debug(customer)
         # customer.id = None

@@ -7,7 +7,6 @@ Describe what your service does here
 from flask import jsonify, request, url_for, abort, json
 from service.common import status  # HTTP Status Codes
 from service.models import Customer, DataValidationError
-from service.common import error_handlers
 
 # Import Flask application
 from . import app
@@ -24,7 +23,7 @@ def index():
         jsonify(
             name="Customer REST API Service",
             version="1.0",
-            paths="/customers",  # url_for("list_customers", _external=True)
+            paths=url_for("list_customers", _external=True),
         ),
         status.HTTP_200_OK,
     )
@@ -33,10 +32,6 @@ def index():
 ######################################################################
 #  R E S T   A P I   E N D P O I N T S
 ######################################################################
-
-# Place your REST API code here ...
-
-
 @app.route("/customers/<int:customer_id>", methods=["DELETE"])
 def delete_customer(customer_id):
     """
