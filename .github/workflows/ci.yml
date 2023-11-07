@@ -12,30 +12,36 @@ jobs:
     runs-on: ubuntu-latest
     container: python:3.11-slim
 
-    # Required services    
+    # Required services
     services:
       # Label used to access the service container
       postgres:
         # Docker Hub image
-        image: postgres:alpine
+        image: postgres
         env:
           POSTGRES_PASSWORD: postgres
-        # Set health checks to wait until postgres has started
+        ports:
+          - 5432:5432
+        # Set health checks to wait until redis has started
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
-        ports:
-          - 5432:5432
 
     # Steps for the build
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-            
+
+      - name: Install OS dependencies
+        run: |
+          apt-get update
+          apt-get install -y gcc libpq-dev
+
       - name: Install dependencies
         run: |
+          python -m pip install --upgrade pip wheel
           pip install -r requirements.txt
 
       - name: Linting
@@ -47,11 +53,12 @@ jobs:
           # Run pylint to catch other PEP8 errors
           pylint service tests --max-line-length=127
 
-      - name: Run unit tests with PyTest
-        run: pytest --pspec --cov=service --cov-fail-under=95
+      - name: Run unit tests with Green
+        run: |
+          export FLASK_APP=service:app
+          green -vvv --processes=1 --run-coverage --termcolor --minimum-coverage=95
         env:
-          DATABASE_URI: "postgresql://postgres:postgres@postgres:5432/postgres"
-
+          DATABASE_URI: "postgresql://postgres:postgres@postgres:5432"
       # Uncomment the following 2 lines during hands-on lab
       
       - name: Upload code coverage
