@@ -7,6 +7,7 @@ from service.models import Customer
 
 class CustomerFactory(factory.Factory):
     """Creates fake customers"""
+
     class Meta:  # pylint: disable=too-few-public-methods
         """Maps factory to data model"""
 
@@ -17,3 +18,4 @@ class CustomerFactory(factory.Factory):
     last_name = factory.Faker("last_name")
     email = factory.Faker("ascii_email")
     address = factory.Faker("address")
+    active = True

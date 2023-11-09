@@ -143,6 +143,25 @@ def update_customer(customer_id):
     return jsonify(existing_customer.serialize()), status.HTTP_200_OK
 
 
+######################################################################
+# DEACTIVATE A CUSTOMER
+######################################################################
+@app.route("/customers/<int:customer_id>/deactivate", methods=["PUT"])
+def deactivate_customer(customer_id):
+    """Deactivate a Customer"""
+    customer = Customer.find(customer_id)
+    if not customer:
+        abort(
+            status.HTTP_404_NOT_FOUND,
+            f"Customer with id '{customer_id}' was not found.",
+        )
+
+    customer.active = False
+    customer.update()
+
+    return customer.serialize(), status.HTTP_200_OK
+
+
 @app.route("/", methods=["POST", "PUT", "DELETE"])
 @app.route("/customers", methods=["PUT", "DELETE"])
 def handle_method_not_supported():

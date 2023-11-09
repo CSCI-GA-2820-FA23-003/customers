@@ -103,6 +103,7 @@ class TestCustomerServer(TestCase):
                 "last_name": fake_customer.last_name,
                 "email": fake_customer.email,
                 "address": fake_customer.address,
+                "active": fake_customer.active,
             }
         )
 
@@ -120,6 +121,7 @@ class TestCustomerServer(TestCase):
         self.assertEqual(new_json["last_name"], fake_customer.last_name)
         self.assertEqual(new_json["email"], fake_customer.email)
         self.assertEqual(new_json["address"], fake_customer.address)
+        self.assertEqual(new_json["active"], fake_customer.active)
 
     def test_create_customer_wrong_field(self):
         """Create a new Customer with wrong field"""
@@ -132,6 +134,7 @@ class TestCustomerServer(TestCase):
                 "lastName": fake_customer.last_name,
                 "email": fake_customer.email,
                 "address": fake_customer.address,
+                "active": fake_customer.active,
             }
         )
 
@@ -170,6 +173,7 @@ class TestCustomerServer(TestCase):
                 "last_name": fake_customer.last_name,
                 "email": fake_customer.email,
                 "address": fake_customer.address,
+                "active": fake_customer.active,
             }
         )
 
@@ -196,6 +200,7 @@ class TestCustomerServer(TestCase):
                 "last_name": fake_customer.last_name,
                 "email": fake_customer.email,
                 "address": fake_customer.address,
+                "active": fake_customer.active,
             }
         )
 
@@ -221,9 +226,10 @@ class TestCustomerServer(TestCase):
             "last_name": fake_customer.last_name,
             "email": fake_customer.email,
             "address": fake_customer.address,
+            "active": fake_customer.active,
         }
 
-        required_fields = ["first_name", "last_name", "email", "address"]
+        required_fields = ["first_name", "last_name", "email", "address", "active"]
 
         for key in required_fields:
             bad_data = data_dict.copy()
@@ -318,6 +324,28 @@ class TestCustomerServer(TestCase):
         self.assertEqual(updated_customer_data["last_name"], updated_customer.last_name)
         self.assertEqual(updated_customer_data["email"], updated_customer.email)
         self.assertEqual(updated_customer_data["address"], updated_customer.address)
+        self.assertEqual(updated_customer_data["active"], updated_customer.active)
+
+    def test_deactivate_a_customer(self):
+        """It should Deactivate a Customer"""
+        customer = self._create_customers(1)[0]
+        response = self.client.get(f"{BASE_URL}/{customer.id}")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
+        logging.debug("Response data: %s", data)
+        self.assertEqual(data["active"], True)
+
+        response = self.client.put(f"{BASE_URL}/{customer.id}/deactivate")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
+        logging.debug("Response data: %s", data)
+        self.assertEqual(data["active"], False)
+
+    def test_deactivate_a_nonexistent_customer(self):
+        """It should Not Deactivate a Nonexistent Customer"""
+        customer = self._create_customers(1)[0]
+        response = self.client.put(f"{BASE_URL}/{customer.id + 1}/deactivate")
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_method_not_supported(self):
         """It should return a HTTP_405_METHOD_NOT_ALLOWED when an unsupported method is called on an endpoint"""
