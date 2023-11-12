@@ -1,0 +1,16 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: customer-ingress
+spec:
+  rules:
+  - host: customer.local  # Replace with your desired hostname
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: customer-service
+            port:
+              number: 80
