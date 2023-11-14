@@ -142,9 +142,11 @@ def update_customer(customer_id):
     app.logger.info("Customer with ID [%s] updated.", customer_id)
     return jsonify(existing_customer.serialize()), status.HTTP_200_OK
 
+
 @app.route('/health')
 def health():
     return jsonify({"status": "OK"}), 200
+
 
 ######################################################################
 # DEACTIVATE A CUSTOMER
