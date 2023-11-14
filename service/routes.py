@@ -176,13 +176,6 @@ def deactivate_customer(customer_id):
     return customer.serialize(), status.HTTP_200_OK
 
 
-@app.route("/", methods=["POST", "PUT", "DELETE"])
-@app.route("/customers", methods=["PUT", "DELETE"])
-def handle_method_not_supported():
-    """Handle invalid HTTP method used on an endpoint"""
-    abort(status.HTTP_405_METHOD_NOT_ALLOWED)
-
-
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S
 ######################################################################
