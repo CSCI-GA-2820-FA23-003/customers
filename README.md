@@ -50,8 +50,9 @@ The Customer API is organized around REST. Our API has predictable resource-orie
 ## Deploy to Local Kubernetes Cluster
 
 ### Prerequisites
-- Kubernetes: Open the Extensions view in VS Code, search for and install Kubernetes Extensions.
-- [Make](https://www.gnu.org/software/make/): Make sure Make is installed on your system.
+
+* Kubernetes: Open the Extensions view in VS Code, search for and install Kubernetes Extensions.
+* [Make](https://www.gnu.org/software/make/): Make sure Make is installed on your system.
 
 ### Getting Started
 
