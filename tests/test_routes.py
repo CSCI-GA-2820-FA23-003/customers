@@ -360,3 +360,10 @@ class TestCustomerServer(TestCase):
         self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
         response = self.client.delete(BASE_URL)
         self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def test_health(self):
+        """Send Request and Test status_code as 200_OK, JSON content as status: OK"""
+        response = self.client.get(BASE_URL + '/health')
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.json, {"status": "OK"})
