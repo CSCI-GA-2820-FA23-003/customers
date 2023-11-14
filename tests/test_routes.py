@@ -5,18 +5,20 @@ Test cases can be run with the following:
   nosetests -v --with-spec --spec-color
   coverage report -m
 """
+import json
+
 # import os
 import logging
 from unittest import TestCase
-import json
+
+from service import app, config
+from service.common import status  # HTTP Status Codes
+from service.models import Customer, db, init_db
+from tests.factories import CustomerFactory
 
 # from flask import url_for
 # from flask import jsonify
 
-from service import app, config
-from service.models import db, init_db, Customer
-from service.common import status  # HTTP Status Codes
-from tests.factories import CustomerFactory
 
 BASE_URL = "/customers"
 
@@ -360,3 +362,10 @@ class TestCustomerServer(TestCase):
         self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
         response = self.client.delete(BASE_URL)
         self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def test_health(self):
+        """Send Request and Test status_code as 200_OK, JSON content as status: OK"""
+        response = self.client.get("/health")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.json, {"status": "OK"})
