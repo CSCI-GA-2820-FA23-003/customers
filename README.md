@@ -65,22 +65,23 @@ make cluster
 
 #### Step 2: Build and Push Docker image
 
-Using the following command to build the project as a Docker image, tag with the registry location, and push it to the registry. Don't forget to mapped cluster-registry:32000 to 127.0.0.1 in the /etc/hosts file before push.
+Use the following commands to build the project as a Docker image, tag with the registry location, and push it to the registry. Don't forget to map cluster-registry:32000 to 127.0.0.1 in the /etc/hosts file before push.
 
 ```bash
 docker build -t customer:1.0 .
 docker tag customer:1.0 cluster-registry:32000/customer:1.0
+sudo sh -c 'echo "127.0.0.1 cluster-registry" >> /etc/hosts'
 docker push cluster-registry:32000/customer:1.0
 ```
 
-#### Step 3: Run Command to Deploy the Kubernetes Cluster
+#### Step 3: Run Commands to Deploy the Kubernetes Cluster
 
-Run the following command in turn to deploy Postgres database as StatefulSet and image we created. Using kubectl get all to check if *pod/postgres-statefulset* and *pod/customer* are running.
+Run the following commands in the specified order to deploy Postgres database as StatefulSet and image we created. Use `kubectl get all` to check if *pod/postgres-statefulset* and *pod/customer* are running. The API should now be available at localhost:8080.
 
 ```bash
 kubectl apply -f k8s/pv.yaml
 kubectl apply -f k8s/secret.yaml
-kubectl apply -f k8s/postgress.yaml
+kubectl apply -f k8s/postgres.yaml
 
 kubectl apply -f k8s/deployment.yaml
 kubectl apply -f k8s/service.yaml
@@ -92,7 +93,7 @@ kubectl apply -f k8s/ingress.yaml
 After testing, clean up the deployed resources:
 
 ```bash
-make cluster-down
+make cluster-rm
 ```
 
 ## License

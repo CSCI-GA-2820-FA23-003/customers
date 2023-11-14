@@ -4,7 +4,7 @@ metadata:
   name: postgres-statefulset
 spec:
   serviceName: postgres
-  replicas: 3
+  replicas: 1
   selector:
     matchLabels:
       app: postgres
@@ -14,18 +14,24 @@ spec:
         app: postgres
     spec:
       containers:
-      - name: postgres
-        image: postgres:latest
-        ports:
-          - containerPort: 5432
-            protocol: TCP
-        volumeMounts:
-          - name: postgres-storage
-            mountPath: /data
+        - name: postgres
+          image: postgres:latest
+          env:
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: my-secret
+                  key: POSTGRES_PASSWORD
+          ports:
+            - containerPort: 5432
+              protocol: TCP
+          volumeMounts:
+            - name: postgres-storage
+              mountPath: /data
       volumes:
-      - name: postgres-storage
-        persistentVolumeClaim:
-          claimName: postgres-data
+        - name: postgres-storage
+          persistentVolumeClaim:
+            claimName: postgres-data
 
 ---
 apiVersion: v1
