@@ -143,6 +143,17 @@ def update_customer(customer_id):
     return jsonify(existing_customer.serialize()), status.HTTP_200_OK
 
 
+@app.route('/health')
+def health():
+    """
+    Endpoint to check the health of the microservice.
+
+    Returns:
+        A JSON response indicating the health status with HTTP_200_OK.
+    """
+    return jsonify({"status": "OK"}), status.HTTP_200_OK
+
+
 ######################################################################
 # DEACTIVATE A CUSTOMER
 ######################################################################

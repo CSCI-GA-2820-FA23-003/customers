@@ -77,16 +77,10 @@ docker push cluster-registry:32000/customer:1.0
 
 #### Step 3: Run Commands to Deploy the Kubernetes Cluster
 
-Run the following commands in the specified order to deploy Postgres database as StatefulSet and image we created. Use `kubectl get all` to check if *pod/postgres-statefulset* and *pod/customer* are running. The API should now be available at localhost:8080.
+Run the following command to deploy Postgres database as StatefulSet and image we created. Use `kubectl get all` to check if *pod/postgres-statefulset* and *pod/customer* are running. The API should now be available at localhost:8080.
 
 ```bash
-kubectl apply -f k8s/pv.yaml
-kubectl apply -f k8s/secret.yaml
-kubectl apply -f k8s/postgres.yaml
-
-kubectl apply -f k8s/deployment.yaml
-kubectl apply -f k8s/service.yaml
-kubectl apply -f k8s/ingress.yaml
+kubectl apply -f k8s
 ```
 
 ### Cleanup
@@ -95,6 +89,14 @@ After testing, clean up the deployed resources:
 
 ```bash
 make cluster-rm
+```
+
+### Test the deployment
+
+Use `/health` endpoint to test the status of microservice. Run `kubectl get services` to get details of services info. Run the following command upon copying *service_ip* and *service_port* from the details provided. You may have to assign EXTERNAL-IP if it shows as pending.
+
+```bash
+curl http://<service_ip>:<service_port>/health
 ```
 
 ## License
