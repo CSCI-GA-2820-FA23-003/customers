@@ -12,6 +12,20 @@ from service.models import Customer, DataValidationError
 from . import app
 
 
+############################################################
+# Health Endpoint
+############################################################
+@app.route("/health")
+def health():
+    """
+    Endpoint to check the health of the microservice.
+
+    Returns:
+        A JSON response indicating the health status with HTTP_200_OK.
+    """
+    return jsonify({"status": "OK"}), status.HTTP_200_OK
+
+
 ######################################################################
 # GET INDEX
 ######################################################################
@@ -141,17 +155,6 @@ def update_customer(customer_id):
 
     app.logger.info("Customer with ID [%s] updated.", customer_id)
     return jsonify(existing_customer.serialize()), status.HTTP_200_OK
-
-
-@app.route('/customers/health')
-def health():
-    """
-    Endpoint to check the health of the microservice.
-
-    Returns:
-        A JSON response indicating the health status with HTTP_200_OK.
-    """
-    return jsonify({"status": "OK"}), status.HTTP_200_OK
 
 
 ######################################################################
