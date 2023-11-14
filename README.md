@@ -83,20 +83,20 @@ Run the following command to deploy Postgres database as StatefulSet and image w
 kubectl apply -f k8s
 ```
 
-### Cleanup
-
-After testing, clean up the deployed resources:
-
-```bash
-make cluster-rm
-```
-
 ### Test the deployment
 
 Use `/health` endpoint to test the status of microservice. Run `kubectl get services` to get details of services info. Run the following command upon copying *service_ip* and *service_port* from the details provided. You may have to assign EXTERNAL-IP if it shows as pending.
 
 ```bash
 curl http://<service_ip>:<service_port>/health
+```
+
+### Cleanup
+
+After testing, clean up the deployed resources:
+
+```bash
+make cluster-rm
 ```
 
 ## License
