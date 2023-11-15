@@ -52,7 +52,7 @@ class TestCustomer(unittest.TestCase):
             last_name="Wagner",
             email="jwagner@example.com",
             address="778 Brown Plaza\nNorth Jenniferfurt, VT 88077",
-            password="Pa55W0rd"
+            password="Pa55W0rd",
             active=True,
         )
         self.assertTrue(customer is not None)
@@ -76,7 +76,7 @@ class TestCustomer(unittest.TestCase):
             last_name="Wagner",
             email="jwagner@example.com",
             address="778 Brown Plaza\nNorth Jenniferfurt, VT 88077",
-            password="Pa55W0rd"
+            password="Pa55W0rd",
             active=True,
         )
         self.assertTrue(customer is not None)
