@@ -314,6 +314,21 @@ class TestCustomerServer(TestCase):
 
         self.assertEqual(len(customers_data), expected_length)
 
+    def test_query_customer_list_by_email(self):
+        """It should Query Customers by Email"""
+        customers = self._create_customers(10)
+        test_email = customers[0].email
+        email_customers = [
+            customer for customer in customers if customer.email == test_email
+        ]
+        response = self.client.get(BASE_URL, query_string=f"email={test_email}")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
+        self.assertEqual(len(data), len(email_customers))
+        # check the data just to be sure
+        for customer in data:
+            self.assertEqual(customer["email"], test_email)
+
     def test_update_customer(self):
         """Test updating a customer"""
         original_customer = self._create_customers(1)[0]
