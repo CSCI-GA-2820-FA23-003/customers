@@ -122,7 +122,6 @@ def list_customers():
 
     This endpoint will retrieve and return a list of all customers
     """
-    """Returns all of the Pets"""
     app.logger.info("Request to list all customers")
     customers = []
     email = request.args.get("email")
