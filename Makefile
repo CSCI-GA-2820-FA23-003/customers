@@ -34,6 +34,7 @@ lint: ## Run the linter
 .PHONY: tests
 test: ## Run the unit tests
 	$(info Running tests...)
+	flask db-create
 	green -vvv --processes=1 --run-coverage --termcolor --minimum-coverage=95
 
 .PHONY: run
