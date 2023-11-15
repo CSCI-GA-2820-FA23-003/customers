@@ -103,6 +103,7 @@ class TestCustomerServer(TestCase):
                 "last_name": fake_customer.last_name,
                 "email": fake_customer.email,
                 "address": fake_customer.address,
+                "password": fake_customer.password,
             }
         )
 
@@ -120,6 +121,7 @@ class TestCustomerServer(TestCase):
         self.assertEqual(new_json["last_name"], fake_customer.last_name)
         self.assertEqual(new_json["email"], fake_customer.email)
         self.assertEqual(new_json["address"], fake_customer.address)
+        self.assertEqual(new_json["password"], fake_customer.password)
 
     def test_create_customer_wrong_field(self):
         """Create a new Customer with wrong field"""
@@ -132,6 +134,7 @@ class TestCustomerServer(TestCase):
                 "lastName": fake_customer.last_name,
                 "email": fake_customer.email,
                 "address": fake_customer.address,
+                "password": fake_customer.password,
             }
         )
 
@@ -170,6 +173,7 @@ class TestCustomerServer(TestCase):
                 "last_name": fake_customer.last_name,
                 "email": fake_customer.email,
                 "address": fake_customer.address,
+                "password": fake_customer.password,
             }
         )
 
@@ -196,6 +200,7 @@ class TestCustomerServer(TestCase):
                 "last_name": fake_customer.last_name,
                 "email": fake_customer.email,
                 "address": fake_customer.address,
+                "password": fake_customer.password,
             }
         )
 
@@ -221,6 +226,7 @@ class TestCustomerServer(TestCase):
             "last_name": fake_customer.last_name,
             "email": fake_customer.email,
             "address": fake_customer.address,
+            "password": fake_customer.password,
         }
 
         required_fields = ["first_name", "last_name", "email", "address"]
@@ -318,6 +324,7 @@ class TestCustomerServer(TestCase):
         self.assertEqual(updated_customer_data["last_name"], updated_customer.last_name)
         self.assertEqual(updated_customer_data["email"], updated_customer.email)
         self.assertEqual(updated_customer_data["address"], updated_customer.address)
+        self.assertEqual(updated_customer_data["password"], updated_customer.password)
 
     def test_method_not_supported(self):
         """It should return a HTTP_405_METHOD_NOT_ALLOWED when an unsupported method is called on an endpoint"""

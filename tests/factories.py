@@ -17,3 +17,4 @@ class CustomerFactory(factory.Factory):
     last_name = factory.Faker("last_name")
     email = factory.Faker("ascii_email")
     address = factory.Faker("address")
+    password = factory.Faker("password")
