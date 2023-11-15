@@ -122,9 +122,18 @@ def list_customers():
 
     This endpoint will retrieve and return a list of all customers
     """
+    """Returns all of the Pets"""
     app.logger.info("Request to list all customers")
-    customers = Customer.all()
-    return jsonify([customer.serialize() for customer in customers]), status.HTTP_200_OK
+    customers = []
+    email = request.args.get("email")
+    if email:
+        customers = Customer.find_by_email(email)
+    else:
+        customers = Customer.all()
+
+    results = [customer.serialize() for customer in customers]
+    app.logger.info("Returning %d customers", len(results))
+    return jsonify(results), status.HTTP_200_OK
 
 
 @app.route("/customers/<int:customer_id>", methods=["PUT"])
