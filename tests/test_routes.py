@@ -346,7 +346,7 @@ class TestCustomerServer(TestCase):
 
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
-        expected_error_message = f"Customer Id: '{non_existing_customer_id}' was not found."
+        expected_error_message = f"404 Not Found: Customer Id: '{non_existing_customer_id}' was not found."
         self.assertEqual(response.get_json()["message"], expected_error_message)
 
     def test_deactivate_a_customer(self):
