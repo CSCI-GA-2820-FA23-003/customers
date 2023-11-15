@@ -53,6 +53,7 @@ class TestCustomer(unittest.TestCase):
             email="jwagner@example.com",
             address="778 Brown Plaza\nNorth Jenniferfurt, VT 88077",
             password="Pa55W0rd"
+            active=True,
         )
         self.assertTrue(customer is not None)
         self.assertEqual(customer.id, None)
@@ -64,6 +65,7 @@ class TestCustomer(unittest.TestCase):
             customer.address, "778 Brown Plaza\nNorth Jenniferfurt, VT 88077"
         )
         self.assertEqual(customer.password, "Pa55W0rd")
+        self.assertEqual(customer.active, True)
 
     def test_add_a_customer(self):
         """It should Create a customer and add it to the database"""
@@ -75,6 +77,7 @@ class TestCustomer(unittest.TestCase):
             email="jwagner@example.com",
             address="778 Brown Plaza\nNorth Jenniferfurt, VT 88077",
             password="Pa55W0rd"
+            active=True,
         )
         self.assertTrue(customer is not None)
         self.assertEqual(customer.id, None)
@@ -99,6 +102,7 @@ class TestCustomer(unittest.TestCase):
         self.assertEqual(found_customer.email, customer.email)
         self.assertEqual(found_customer.address, customer.address)
         self.assertEqual(found_customer.password, customer.password)
+        self.assertEqual(found_customer.active, customer.active)
 
     def test_update_a_customer(self):
         """It should Update a Customer"""
@@ -166,6 +170,8 @@ class TestCustomer(unittest.TestCase):
         self.assertEqual(data["address"], customer.address)
         self.assertIn("password", data)
         self.assertEqual(data["password"], customer.password)
+        self.assertIn("active", data)
+        self.assertEqual(data["active"], customer.active)
 
     def test_deserialize_a_customer(self):
         """It should de-serialize a Customer"""
@@ -179,6 +185,7 @@ class TestCustomer(unittest.TestCase):
         self.assertEqual(data["email"], customer.email)
         self.assertEqual(data["address"], customer.address)
         self.assertEqual(data["password"], customer.password)
+        self.assertEqual(data["active"], customer.active)
 
     def test_deserialize_missing_data(self):
         """It should not deserialize a Customer with missing data"""
@@ -187,6 +194,7 @@ class TestCustomer(unittest.TestCase):
             "first_name": "Vanessa",
             "email": "vanessa3@yahoo.com",
             "address": "3513 John Divide Suite 115\nRodriguezside, LA 93111",
+            "active": "True",
         }
         customer = Customer()
         self.assertRaises(DataValidationError, customer.deserialize, data)
@@ -213,6 +221,7 @@ class TestCustomer(unittest.TestCase):
         self.assertEqual(customer.last_name, customers[1].last_name)
         self.assertEqual(customer.email, customers[1].email)
         self.assertEqual(customer.address, customers[1].address)
+        self.assertEqual(customer.active, customers[1].active)
 
     def test_find_by_name(self):
         """It should Find a Customer by Name"""

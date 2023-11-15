@@ -12,6 +12,20 @@ from service.models import Customer, DataValidationError
 from . import app
 
 
+############################################################
+# Health Endpoint
+############################################################
+@app.route("/health")
+def health():
+    """
+    Endpoint to check the health of the microservice.
+
+    Returns:
+        A JSON response indicating the health status with HTTP_200_OK.
+    """
+    return jsonify({"status": "OK"}), status.HTTP_200_OK
+
+
 ######################################################################
 # GET INDEX
 ######################################################################
@@ -143,11 +157,23 @@ def update_customer(customer_id):
     return jsonify(existing_customer.serialize()), status.HTTP_200_OK
 
 
-@app.route("/", methods=["POST", "PUT", "DELETE"])
-@app.route("/customers", methods=["PUT", "DELETE"])
-def handle_method_not_supported():
-    """Handle invalid HTTP method used on an endpoint"""
-    abort(status.HTTP_405_METHOD_NOT_ALLOWED)
+######################################################################
+# DEACTIVATE A CUSTOMER
+######################################################################
+@app.route("/customers/<int:customer_id>/deactivate", methods=["PUT"])
+def deactivate_customer(customer_id):
+    """Deactivate a Customer"""
+    customer = Customer.find(customer_id)
+    if not customer:
+        abort(
+            status.HTTP_404_NOT_FOUND,
+            f"Customer with id '{customer_id}' was not found.",
+        )
+
+    customer.active = False
+    customer.update()
+
+    return customer.serialize(), status.HTTP_200_OK
 
 
 ######################################################################
