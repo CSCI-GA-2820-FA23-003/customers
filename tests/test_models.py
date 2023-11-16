@@ -240,3 +240,15 @@ class TestCustomer(unittest.TestCase):
         self.assertEqual(found.count(), count)
         for customer in found:
             self.assertEqual(customer.get_full_name(), full_name)
+
+    def test_find_by_email(self):
+        """It should Find a Customer by Email"""
+        customers = CustomerFactory.create_batch(10)
+        for customer in customers:
+            customer.create()
+        email = customers[0].email
+        count = len([customer for customer in customers if customer.email == email])
+        found = Customer.find_by_email(email)
+        self.assertEqual(found.count(), count)
+        for customer in found:
+            self.assertEqual(customer.email, email)
