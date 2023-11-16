@@ -313,7 +313,7 @@ class TestCustomerServer(TestCase):
         expected_length = initial_customer_count + 3
 
         self.assertEqual(len(customers_data), expected_length)
-        
+
     def test_query_customer_list_by_email(self):
         """It should Query Customers by Email"""
         customers = self._create_customers(10)
@@ -361,7 +361,9 @@ class TestCustomerServer(TestCase):
 
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
-        expected_error_message = f"404 Not Found: Customer Id: '{non_existing_customer_id}' was not found."
+        expected_error_message = (
+            f"404 Not Found: Customer Id: '{non_existing_customer_id}' was not found."
+        )
         self.assertEqual(response.get_json()["message"], expected_error_message)
 
     def test_deactivate_a_customer(self):
