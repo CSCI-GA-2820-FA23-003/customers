@@ -329,8 +329,8 @@ class TestCustomerServer(TestCase):
         for customer in data:
             self.assertEqual(customer["email"], test_email)
 
-    def test_update_customer(self):
-        """Test updating a customer"""
+    def test_update_existing_customer(self):
+        """Test updating an existing customer should return 200_OK"""
         original_customer = self._create_customers(1)[0]
         updated_customer = CustomerFactory()
 
@@ -349,6 +349,22 @@ class TestCustomerServer(TestCase):
         self.assertEqual(updated_customer_data["address"], updated_customer.address)
         self.assertEqual(updated_customer_data["password"], updated_customer.password)
         self.assertEqual(updated_customer_data["active"], updated_customer.active)
+
+    def test_update_non_existing_customer(self):
+        """Test updating a non-existing customer should return 404_NOT_FOUND"""
+        non_existing_customer_id = 9999
+        updated_customer = CustomerFactory()
+
+        response = self.client.put(
+            f"{BASE_URL}/{non_existing_customer_id}", json=updated_customer.serialize()
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+        expected_error_message = (
+            f"404 Not Found: Customer Id: '{non_existing_customer_id}' was not found."
+        )
+        self.assertEqual(response.get_json()["message"], expected_error_message)
 
     def test_deactivate_a_customer(self):
         """It should Deactivate a Customer"""
