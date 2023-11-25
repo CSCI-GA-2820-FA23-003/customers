@@ -35,7 +35,7 @@ class Customer(db.Model):
     last_name = db.Column(db.String(64), nullable=False)
     email = db.Column(db.String(64), nullable=False)
     address = db.Column(db.String(128), nullable=False)
-    password = db.Column(db.String(64), nullable=False)
+    password = db.Column(db.String(64), nullable=True)
     active = db.Column(db.Boolean(), nullable=False, default=True)
 
     def __repr__(self):

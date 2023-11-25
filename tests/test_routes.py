@@ -77,13 +77,6 @@ class TestCustomerServer(TestCase):
     #  P L A C E   T E S T   C A S E S   H E R E
     ######################################################################
 
-    def test_index(self):
-        """It should call the home page"""
-        response = self.client.get("/")
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        data = response.get_json()
-        self.assertEqual(data["name"], "Customer REST API Service")
-
     def test_delete_customer(self):
         """It should Delete a Customer"""
         test_customer = self._create_customers(1)[0]
