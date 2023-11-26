@@ -12,9 +12,9 @@ $(function () {
         $("#customer_email").val(res.email);
         $("#customer_address").val(res.address);
         if (res.active == true) {
-            $("#customer_available").val("true");
+            $("#customer_active").val("true");
         } else {
-            $("#customer_available").val("false");
+            $("#customer_active").val("false");
         }
     }
 
@@ -84,7 +84,7 @@ $(function () {
         let lastName = $("#customer_last_name").val();
         let email = $("#customer_email").val();
         let address = $("#customer_address").val();
-        let available = $("#customer_available").val() == "true";
+        let active = $("#customer_active").val() == "true";
 
         let data = {
             "first_name": firstName,

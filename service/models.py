@@ -35,7 +35,7 @@ class Customer(db.Model):
     last_name = db.Column(db.String(64), nullable=False)
     email = db.Column(db.String(64), nullable=False)
     address = db.Column(db.String(128), nullable=False)
-    password = db.Column(db.String(64), nullable=True)
+    # password = db.Column(db.String(64), nullable=False)
     active = db.Column(db.Boolean(), nullable=False, default=True)
 
     def __repr__(self):
@@ -79,7 +79,7 @@ class Customer(db.Model):
             "last_name": self.last_name,
             "email": self.email,
             "address": self.address,
-            "password": self.password,
+            # "password": self.password,
             "active": self.active,
         }
 
@@ -95,7 +95,7 @@ class Customer(db.Model):
             self.last_name = data["last_name"]
             self.email = data["email"]
             self.address = data["address"]
-            self.password = data["password"]
+            # self.password = data.get("password")
             self.active = data["active"]
         except KeyError as error:
             raise DataValidationError(
