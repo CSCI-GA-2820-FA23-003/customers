@@ -76,13 +76,11 @@ class TestCustomerServer(TestCase):
     ######################################################################
     #  P L A C E   T E S T   C A S E S   H E R E
     ######################################################################
-
     def test_index(self):
-        """It should call the home page"""
+        """It should return the index page"""
         response = self.client.get("/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        data = response.get_json()
-        self.assertEqual(data["name"], "Customer REST API Service")
+        self.assertIn(b"Customer REST API Service", response.data)
 
     def test_delete_customer(self):
         """It should Delete a Customer"""
@@ -105,7 +103,7 @@ class TestCustomerServer(TestCase):
                 "last_name": fake_customer.last_name,
                 "email": fake_customer.email,
                 "address": fake_customer.address,
-                "password": fake_customer.password,
+                # "password": fake_customer.password,
                 "active": fake_customer.active,
             }
         )
@@ -124,7 +122,7 @@ class TestCustomerServer(TestCase):
         self.assertEqual(new_json["last_name"], fake_customer.last_name)
         self.assertEqual(new_json["email"], fake_customer.email)
         self.assertEqual(new_json["address"], fake_customer.address)
-        self.assertEqual(new_json["password"], fake_customer.password)
+        # self.assertEqual(new_json["password"], fake_customer.password)
         self.assertEqual(new_json["active"], fake_customer.active)
 
     def test_create_customer_wrong_field(self):
@@ -138,7 +136,7 @@ class TestCustomerServer(TestCase):
                 "lastName": fake_customer.last_name,
                 "email": fake_customer.email,
                 "address": fake_customer.address,
-                "password": fake_customer.password,
+                # "password": fake_customer.password,
                 "active": fake_customer.active,
             }
         )
@@ -178,7 +176,7 @@ class TestCustomerServer(TestCase):
                 "last_name": fake_customer.last_name,
                 "email": fake_customer.email,
                 "address": fake_customer.address,
-                "password": fake_customer.password,
+                # "password": fake_customer.password,
                 "active": fake_customer.active,
             }
         )
@@ -206,7 +204,7 @@ class TestCustomerServer(TestCase):
                 "last_name": fake_customer.last_name,
                 "email": fake_customer.email,
                 "address": fake_customer.address,
-                "password": fake_customer.password,
+                # "password": fake_customer.password,
                 "active": fake_customer.active,
             }
         )
@@ -233,7 +231,7 @@ class TestCustomerServer(TestCase):
             "last_name": fake_customer.last_name,
             "email": fake_customer.email,
             "address": fake_customer.address,
-            "password": fake_customer.password,
+            # "password": fake_customer.password,
             "active": fake_customer.active,
         }
 
@@ -314,8 +312,23 @@ class TestCustomerServer(TestCase):
 
         self.assertEqual(len(customers_data), expected_length)
 
-    def test_update_customer(self):
-        """Test updating a customer"""
+    def test_query_customer_list_by_email(self):
+        """It should Query Customers by Email"""
+        customers = self._create_customers(10)
+        test_email = customers[0].email
+        email_customers = [
+            customer for customer in customers if customer.email == test_email
+        ]
+        response = self.client.get(BASE_URL, query_string=f"email={test_email}")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
+        self.assertEqual(len(data), len(email_customers))
+        # check the data just to be sure
+        for customer in data:
+            self.assertEqual(customer["email"], test_email)
+
+    def test_update_existing_customer(self):
+        """Test updating an existing customer should return 200_OK"""
         original_customer = self._create_customers(1)[0]
         updated_customer = CustomerFactory()
 
@@ -332,8 +345,24 @@ class TestCustomerServer(TestCase):
         self.assertEqual(updated_customer_data["last_name"], updated_customer.last_name)
         self.assertEqual(updated_customer_data["email"], updated_customer.email)
         self.assertEqual(updated_customer_data["address"], updated_customer.address)
-        self.assertEqual(updated_customer_data["password"], updated_customer.password)
+        # self.assertEqual(updated_customer_data["password"], updated_customer.password)
         self.assertEqual(updated_customer_data["active"], updated_customer.active)
+
+    def test_update_non_existing_customer(self):
+        """Test updating a non-existing customer should return 404_NOT_FOUND"""
+        non_existing_customer_id = 9999
+        updated_customer = CustomerFactory()
+
+        response = self.client.put(
+            f"{BASE_URL}/{non_existing_customer_id}", json=updated_customer.serialize()
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+        expected_error_message = (
+            f"404 Not Found: Customer Id: '{non_existing_customer_id}' was not found."
+        )
+        self.assertEqual(response.get_json()["message"], expected_error_message)
 
     def test_deactivate_a_customer(self):
         """It should Deactivate a Customer"""

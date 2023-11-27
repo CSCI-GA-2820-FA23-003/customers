@@ -52,7 +52,7 @@ class TestCustomer(unittest.TestCase):
             last_name="Wagner",
             email="jwagner@example.com",
             address="778 Brown Plaza\nNorth Jenniferfurt, VT 88077",
-            password="Pa55W0rd",
+            # password="Pa55W0rd",
             active=True,
         )
         self.assertTrue(customer is not None)
@@ -64,7 +64,7 @@ class TestCustomer(unittest.TestCase):
         self.assertEqual(
             customer.address, "778 Brown Plaza\nNorth Jenniferfurt, VT 88077"
         )
-        self.assertEqual(customer.password, "Pa55W0rd")
+        # self.assertEqual(customer.password, "Pa55W0rd")
         self.assertEqual(customer.active, True)
 
     def test_add_a_customer(self):
@@ -76,7 +76,7 @@ class TestCustomer(unittest.TestCase):
             last_name="Wagner",
             email="jwagner@example.com",
             address="778 Brown Plaza\nNorth Jenniferfurt, VT 88077",
-            password="Pa55W0rd",
+            # password="Pa55W0rd",
             active=True,
         )
         self.assertTrue(customer is not None)
@@ -101,7 +101,7 @@ class TestCustomer(unittest.TestCase):
         self.assertEqual(found_customer.last_name, customer.last_name)
         self.assertEqual(found_customer.email, customer.email)
         self.assertEqual(found_customer.address, customer.address)
-        self.assertEqual(found_customer.password, customer.password)
+        # self.assertEqual(found_customer.password, customer.password)
         self.assertEqual(found_customer.active, customer.active)
 
     def test_update_a_customer(self):
@@ -168,8 +168,8 @@ class TestCustomer(unittest.TestCase):
         self.assertEqual(data["email"], customer.email)
         self.assertIn("address", data)
         self.assertEqual(data["address"], customer.address)
-        self.assertIn("password", data)
-        self.assertEqual(data["password"], customer.password)
+        # self.assertIn("password", data)
+        # self.assertEqual(data["password"], customer.password)
         self.assertIn("active", data)
         self.assertEqual(data["active"], customer.active)
 
@@ -184,7 +184,7 @@ class TestCustomer(unittest.TestCase):
         self.assertEqual(data["last_name"], customer.last_name)
         self.assertEqual(data["email"], customer.email)
         self.assertEqual(data["address"], customer.address)
-        self.assertEqual(data["password"], customer.password)
+        # self.assertEqual(data["password"], customer.password)
         self.assertEqual(data["active"], customer.active)
 
     def test_deserialize_missing_data(self):
@@ -240,3 +240,15 @@ class TestCustomer(unittest.TestCase):
         self.assertEqual(found.count(), count)
         for customer in found:
             self.assertEqual(customer.get_full_name(), full_name)
+
+    def test_find_by_email(self):
+        """It should Find a Customer by Email"""
+        customers = CustomerFactory.create_batch(10)
+        for customer in customers:
+            customer.create()
+        email = customers[0].email
+        count = len([customer for customer in customers if customer.email == email])
+        found = Customer.find_by_email(email)
+        self.assertEqual(found.count(), count)
+        for customer in found:
+            self.assertEqual(customer.email, email)

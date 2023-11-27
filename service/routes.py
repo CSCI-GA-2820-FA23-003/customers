@@ -31,16 +31,8 @@ def health():
 ######################################################################
 @app.route("/")
 def index():
-    """Root URL response"""
-    app.logger.info("Request for Root URL")
-    return (
-        jsonify(
-            name="Customer REST API Service",
-            version="1.0",
-            paths=url_for("list_customers", _external=True),
-        ),
-        status.HTTP_200_OK,
-    )
+    """Base URL for our service"""
+    return app.send_static_file("index.html")
 
 
 ######################################################################
@@ -123,8 +115,16 @@ def list_customers():
     This endpoint will retrieve and return a list of all customers
     """
     app.logger.info("Request to list all customers")
-    customers = Customer.all()
-    return jsonify([customer.serialize() for customer in customers]), status.HTTP_200_OK
+    customers = []
+    email = request.args.get("email")
+    if email:
+        customers = Customer.find_by_email(email)
+    else:
+        customers = Customer.all()
+
+    results = [customer.serialize() for customer in customers]
+    app.logger.info("Returning %d customers", len(results))
+    return jsonify(results), status.HTTP_200_OK
 
 
 @app.route("/customers/<int:customer_id>", methods=["PUT"])

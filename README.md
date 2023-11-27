@@ -26,6 +26,7 @@ The Customer API is organized around REST. Our API has predictable resource-orie
   | last_name | String | Yes |
   | email | String | Yes |
   | address | String | Yes |
+  | active | Boolean | Yes |
 
 ### Retrieve a customer
 
@@ -42,6 +43,7 @@ The Customer API is organized around REST. Our API has predictable resource-orie
   | last_name | String | Yes |
   | email | String | Yes |
   | address | String | Yes |
+  | active | Boolean | Yes |
 
 ### Delete a customer
 
