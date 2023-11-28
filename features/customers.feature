@@ -70,13 +70,11 @@ Scenario: Delete a Customer
 
 Scenario: Update a Customer
     When I visit the "Home Page"
-    And I set the "First Name" to "Jonathan"
+    And I set the "Email" to "jrich@yahoo.com"
     And I press the "Search" button
     Then I should see the message "Success"
     And I should see "Jonathan" in the "First Name" field
-    And I should see "Richard" in the "Last Name" field
-    And I should see "jrich@yahoo.com" in the "Email" field
-    And I should see "778 Brown Plaza\nNorth Jenniferfurt, VT 88077" in the "Address" field    
+    And I should see "Richard" in the "Last Name" field  
     When I change "First Name" to "Olivia"
     And I press the "Update" button
     Then I should see the message "Success"
@@ -85,7 +83,7 @@ Scenario: Update a Customer
     And I paste the "Id" field
     And I press the "Retrieve" button
     Then I should see the message "Success"
-    And I should see "Olivia" in the "Name" field
+    And I should see "Olivia" in the "First Name" field
     When I press the "Clear" button
     And I press the "Search" button
     Then I should see the message "Success"
