@@ -67,4 +67,25 @@ Scenario: Delete a Customer
     When I paste the "Id" field
     And I press the "Delete" button
     Then I should see the message "Customer has been Deleted!"
-    
+
+Scenario: Update a Customer
+    When I visit the "Home Page"
+    And I set the "Email" to "jrich@yahoo.com"
+    And I press the "Search" button
+    Then I should see the message "Success"
+    And I should see "Jonathan" in the "First Name" field
+    And I should see "Richard" in the "Last Name" field  
+    When I change "First Name" to "Olivia"
+    And I press the "Update" button
+    Then I should see the message "Success"
+    When I copy the "Id" field
+    And I press the "Clear" button
+    And I paste the "Id" field
+    And I press the "Retrieve" button
+    Then I should see the message "Success"
+    And I should see "Olivia" in the "First Name" field
+    When I press the "Clear" button
+    And I press the "Search" button
+    Then I should see the message "Success"
+    And I should see "Olivia" in the results
+    And I should not see "Jonathan" in the results
