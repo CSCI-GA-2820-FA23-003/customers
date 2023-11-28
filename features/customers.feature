@@ -40,6 +40,14 @@ Scenario: Create a Customer
     And I should see "3513 John Divide Suite 115\nRodriguezside, LA 93111" in the "Address" field
     And I should see "True" in the "Active" dropdown
 
+Scenario: List all Customers
+    When I visit the "Home Page"
+    And I press the "Search" button
+    Then I should see the message "Success"
+    And I should see "William " in the results
+    And I should see "Jonathan" in the results
+    And I should see "Megan" in the results
+
 Scenario: Delete a Customer
     When I visit the "Home Page"
     And I set the "First Name" to "Megan"
