@@ -5,6 +5,7 @@ Test cases for Customer Model
 # import os
 import logging
 import unittest
+import hashlib
 
 from service.models import Customer, DataValidationError, db
 from service import app, config
@@ -47,12 +48,14 @@ class TestCustomer(unittest.TestCase):
 
     def test_create_a_customer(self):
         """It should Create a customer and assert that it exists"""
+        raw_password="P@ssw0rd!123"
         customer = Customer(
             first_name="Jorge",
             last_name="Wagner",
             email="jwagner@example.com",
             address="778 Brown Plaza\nNorth Jenniferfurt, VT 88077",
-            # password="Pa55W0rd",
+            salt="6edcc0329c89cb56c6ddfb4dfe451887",
+            password="4f1b60f3fea4f90aacd277108bc646efd7e99ac6590cae4d643da49cc72d174a",
             active=True,
         )
         self.assertTrue(customer is not None)
@@ -64,7 +67,8 @@ class TestCustomer(unittest.TestCase):
         self.assertEqual(
             customer.address, "778 Brown Plaza\nNorth Jenniferfurt, VT 88077"
         )
-        # self.assertEqual(customer.password, "Pa55W0rd")
+        hashed_password = hashlib.sha256(customer.salt.encode() + raw_password.encode()).hexdigest()
+        self.assertEqual(customer.password, hashed_password)
         self.assertEqual(customer.active, True)
 
     def test_add_a_customer(self):
@@ -76,7 +80,8 @@ class TestCustomer(unittest.TestCase):
             last_name="Wagner",
             email="jwagner@example.com",
             address="778 Brown Plaza\nNorth Jenniferfurt, VT 88077",
-            # password="Pa55W0rd",
+            salt="6edcc0329c89cb56c6ddfb4dfe451887",
+            password="ad8c42981c45bf95b2f39cdef68d363a48f29b56aff5b15f235bd7f88825b7f5",
             active=True,
         )
         self.assertTrue(customer is not None)
@@ -101,6 +106,8 @@ class TestCustomer(unittest.TestCase):
         self.assertEqual(found_customer.last_name, customer.last_name)
         self.assertEqual(found_customer.email, customer.email)
         self.assertEqual(found_customer.address, customer.address)
+        hashed_password = hashlib.sha256(found_customer.salt.encode() + "P@ssw0rd!123".encode()).hexdigest()
+        self.assertEqual(found_customer.password, hashed_password)
         # self.assertEqual(found_customer.password, customer.password)
         self.assertEqual(found_customer.active, customer.active)
 
@@ -168,7 +175,9 @@ class TestCustomer(unittest.TestCase):
         self.assertEqual(data["email"], customer.email)
         self.assertIn("address", data)
         self.assertEqual(data["address"], customer.address)
-        # self.assertIn("password", data)
+        self.assertIn("password", data)
+        hashed_password = hashlib.sha256(customer.salt.encode() + "P@ssw0rd!123".encode()).hexdigest()
+        self.assertEqual(data["password"], hashed_password)
         # self.assertEqual(data["password"], customer.password)
         self.assertIn("active", data)
         self.assertEqual(data["active"], customer.active)
@@ -185,6 +194,8 @@ class TestCustomer(unittest.TestCase):
         self.assertEqual(data["email"], customer.email)
         self.assertEqual(data["address"], customer.address)
         # self.assertEqual(data["password"], customer.password)
+        hashed_password = hashlib.sha256(customer.salt.encode() + "P@ssw0rd!123".encode()).hexdigest()
+        self.assertEqual(data["password"], hashed_password)
         self.assertEqual(data["active"], customer.active)
 
     def test_deserialize_missing_data(self):
