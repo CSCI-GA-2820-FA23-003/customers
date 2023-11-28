@@ -68,6 +68,33 @@ Scenario: Delete a Customer
     And I press the "Delete" button
     Then I should see the message "Customer has been Deleted!"
 
+Scenario: Query for active Customers
+    When I visit the "Home Page"
+    And I select "True" in the "Active" dropdown
+    And I press the "Search" button
+    Then I should see the message "Success"
+    And I should see "William" in the results
+    And I should see "Jonathan" in the results
+    And I should not see "Megan" in the results
+
+Scenario: Query for inactive Customers
+    When I visit the "Home Page"
+    And I select "False" in the "Active" dropdown
+    And I press the "Search" button
+    Then I should see the message "Success"
+    And I should see "Megan" in the results
+    And I should not see "William" in the results
+    And I should not see "Jonathan" in the results
+
+Scenario: Query for a certain Customer
+    When I visit the "Home Page"
+    And I set the "Email" to "will.dixon@hotmail.com"
+    And I press the "Search" button
+    Then I should see the message "Success"
+    And I should see "William" in the results
+    And I should not see "Jonathan" in the results
+    And I should not see "Megan" in the results
+
 Scenario: Update a Customer
     When I visit the "Home Page"
     And I set the "Email" to "jrich@yahoo.com"
