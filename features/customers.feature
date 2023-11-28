@@ -39,3 +39,24 @@ Scenario: Create a Customer
     And I should see "kfisher@example.org" in the "Email" field
     And I should see "3513 John Divide Suite 115\nRodriguezside, LA 93111" in the "Address" field
     And I should see "True" in the "Active" dropdown
+
+Scenario: Delete a Customer
+    When I visit the "Home Page"
+    And I set the "First Name" to "Megan"
+    And I set the "Last Name" to "Chang"
+    And I set the "Email" to "mchang@gmail.com"
+    And I set the "Address" to "398 Wallace Ranch Suite 593\nIvanburgh, AZ 80818"
+    And I select "False" in the "Active" dropdown
+    And I press the "Search" button
+    Then I should see the message "Success"
+    When I copy the "Id" field
+    And I press the "Clear" button
+    Then the "Id" field should be empty
+    And the "First Name" field should be empty
+    And the "Last Name" field should be empty
+    And the "Email" field should be empty
+    And the "Address" field should be empty
+    When I paste the "Id" field
+    And I press the "Delete" button
+    Then I should see the message "Customer has been Deleted!"
+    
