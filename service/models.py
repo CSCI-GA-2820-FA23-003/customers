@@ -22,6 +22,7 @@ class DataValidationError(Exception):
     """Used for an data validation errors when deserializing"""
 
 
+# pylint: disable=too-many-instance-attributes
 class Customer(db.Model):
     """
     Class that represents a Customer
@@ -35,7 +36,8 @@ class Customer(db.Model):
     last_name = db.Column(db.String(64), nullable=False)
     email = db.Column(db.String(64), nullable=False)
     address = db.Column(db.String(128), nullable=False)
-    # password = db.Column(db.String(64), nullable=False)
+    salt = db.Column(db.String(32), nullable=False)
+    password = db.Column(db.String(64), nullable=False)
     active = db.Column(db.Boolean(), nullable=False, default=True)
 
     def __repr__(self):
@@ -79,7 +81,8 @@ class Customer(db.Model):
             "last_name": self.last_name,
             "email": self.email,
             "address": self.address,
-            # "password": self.password,
+            "salt": self.salt,
+            "password": self.password,
             "active": self.active,
         }
 
@@ -90,12 +93,19 @@ class Customer(db.Model):
         Args:
             data (dict): A dictionary containing the resource data
         """
+        # import hashlib
+
+        # def hash_password(salt, password):
+        #     hashed_password = hashlib.sha256(salt.encode() + password.encode()).hexdigest()
+        #     return salt, hashed_password
         try:
             self.first_name = data["first_name"]
             self.last_name = data["last_name"]
             self.email = data["email"]
             self.address = data["address"]
-            # self.password = data.get("password")
+            # self.salt,self.password = hash_password(data["salt"],data["password"])
+            self.salt = data["salt"]
+            self.password = data["password"]
             self.active = data["active"]
         except KeyError as error:
             raise DataValidationError(

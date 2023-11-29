@@ -5,10 +5,10 @@ Feature: The customer service back-end
 
 Background:
     Given the following customers
-        | firstName     | lastName      | email                   | address                                              | active |
-        | William       | Dixon         | will.dixon@hotmail.com  | PSC 4115, Box 7815\nAPO AA 41945                     | True   |
-        | Jonathan      | Richard       | jrich@yahoo.com         | 778 Brown Plaza\nNorth Jenniferfurt, VT 88077        | True   |
-        | Megan         | Chang         | mchang@gmail.com        | 398 Wallace Ranch Suite 593\nIvanburgh, AZ 80818     | False  |
+        | firstName     | lastName      | email                   | address                                              | active |               salt               |                             password                             |
+        | William       | Dixon         | will.dixon@hotmail.com  | PSC 4115, Box 7815\nAPO AA 41945                     | True   | 6edcc0329c89cb56c6ddfb4dfe451887 | 4f1b60f3fea4f90aacd277108bc646efd7e99ac6590cae4d643da49cc72d174a |
+        | Jonathan      | Richard       | jrich@yahoo.com         | 778 Brown Plaza\nNorth Jenniferfurt, VT 88077        | True   | 6edcc0329c89cb56c6ddfb4dfe451887 | 4f1b60f3fea4f90aacd277108bc646efd7e99ac6590cae4d643da49cc72d174a |
+        | Megan         | Chang         | mchang@gmail.com        | 398 Wallace Ranch Suite 593\nIvanburgh, AZ 80818     | False  | 6edcc0329c89cb56c6ddfb4dfe451887 | 4f1b60f3fea4f90aacd277108bc646efd7e99ac6590cae4d643da49cc72d174a |
 
 Scenario: The server is running
     When I visit the "Home Page"
