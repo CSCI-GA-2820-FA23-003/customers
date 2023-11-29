@@ -92,9 +92,9 @@ class Customer(db.Model):
         Args:
             data (dict): A dictionary containing the resource data
         """
-        import os
         import hashlib
-        def hash_password(salt,password):
+
+        def hash_password(salt, password):
             hashed_password = hashlib.sha256(salt.encode() + password.encode()).hexdigest()
             return salt, hashed_password
         try:

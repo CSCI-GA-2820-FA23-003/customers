@@ -48,7 +48,7 @@ class TestCustomer(unittest.TestCase):
 
     def test_create_a_customer(self):
         """It should Create a customer and assert that it exists"""
-        raw_password="P@ssw0rd!123"
+        raw_password = "P@ssw0rd!123"
         customer = Customer(
             first_name="Jorge",
             last_name="Wagner",
