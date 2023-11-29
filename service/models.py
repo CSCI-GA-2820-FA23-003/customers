@@ -92,11 +92,11 @@ class Customer(db.Model):
         Args:
             data (dict): A dictionary containing the resource data
         """
-        import hashlib
+        # import hashlib
 
-        def hash_password(salt, password):
-            hashed_password = hashlib.sha256(salt.encode() + password.encode()).hexdigest()
-            return salt, hashed_password
+        # def hash_password(salt, password):
+        #     hashed_password = hashlib.sha256(salt.encode() + password.encode()).hexdigest()
+        #     return salt, hashed_password
         try:
             self.first_name = data["first_name"]
             self.last_name = data["last_name"]

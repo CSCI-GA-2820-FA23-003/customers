@@ -1,10 +1,10 @@
 """
 Test Factory to make fake objects for testing
 """
-import factory
-from service.models import Customer
 import os
 import hashlib
+import factory
+from service.models import Customer
 
 
 class CustomerFactory(factory.Factory):
