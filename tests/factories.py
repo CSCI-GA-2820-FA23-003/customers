@@ -1,6 +1,8 @@
 """
 Test Factory to make fake objects for testing
 """
+import os
+import hashlib
 import factory
 from service.models import Customer
 
@@ -18,5 +20,6 @@ class CustomerFactory(factory.Factory):
     last_name = factory.Faker("last_name")
     email = factory.Faker("ascii_email")
     address = factory.Faker("address")
-    # password = factory.Faker("password")
+    salt = os.urandom(16).hex()
+    password = factory.LazyAttribute(lambda obj: hashlib.sha256(obj.salt.encode() + "P@ssw0rd!123".encode()).hexdigest())
     active = True

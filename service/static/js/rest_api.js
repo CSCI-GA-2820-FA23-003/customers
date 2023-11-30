@@ -10,6 +10,8 @@ $(function () {
         $("#customer_first_name").val(res.first_name);
         $("#customer_last_name").val(res.last_name);
         $("#customer_email").val(res.email);
+        $("#customer_salt").val(res.salt);
+        $("#customer_password").val(res.password);
         $("#customer_address").val(res.address);
         if (res.active == true) {
             $("#customer_active").val("true");
@@ -25,6 +27,8 @@ $(function () {
         $("#customer_email").val("");
         $("#customer_address").val("");
         $("#customer_active").val("");
+        $("#customer_salt").val("");
+        $("#customer_password").val("");
     }
 
     // Updates the flash message area
@@ -44,13 +48,17 @@ $(function () {
         let email = $("#customer_email").val();
         let address = $("#customer_address").val();
         let active = $("#customer_active").val() == "true";
+        let salt = $("#customer_salt").val();
+        let password = $("#customer_password").val();
 
         let data = {
             "first_name": firstName,
             "last_name": lastName,
             "email": email,
             "address": address,
-            "active": active
+            "active": active,
+            "salt": salt,
+            "password": password
         };
 
         $("#flash_message").empty();
@@ -85,13 +93,17 @@ $(function () {
         let email = $("#customer_email").val();
         let address = $("#customer_address").val();
         let active = $("#customer_active").val() == "true";
+        let salt = $("#customer_salt").val();
+        let password = $("#customer_password").val();
 
         let data = {
             "first_name": firstName,
             "last_name": lastName,
             "email": email,
             "address": address,
-            "active": active
+            "active": active,
+            "salt": salt,
+            "password": password
         };
 
         $("#flash_message").empty();
@@ -142,6 +154,33 @@ $(function () {
             flash_message(res.responseJSON.message)
         });
 
+    });
+
+    // ****************************************
+    // Deactivate a Customer
+    // ****************************************
+
+    $("#deactivate-btn").click(function () {
+
+        let customer_id = $("#customer_id").val();
+
+        $("#flash_message").empty();
+
+        let ajax = $.ajax({
+            type: "PUT",
+            url: `/customers/${customer_id}/deactivate`,
+            contentType: "application/json",
+            data: '',
+        })
+
+        ajax.done(function(res){
+            clear_form_data()
+            flash_message("Customer has been Deactivated!")
+        });
+
+        ajax.fail(function(res){
+            flash_message("Server error!")
+        });
     });
 
     // ****************************************
@@ -215,11 +254,13 @@ $(function () {
             table += '<th class="col-md-3">Email</th>'
             table += '<th class="col-md-4">Address</th>'
             table += '<th class="col-md-1">Active</th>'
+            table += '<th class="col-md-4">Salt</th>'
+            table += '<th class="col-md-4">Password</th>'
             table += '</tr></thead><tbody>'
             let firstCustomer = "";
             for(let i = 0; i < res.length; i++) {
                 let customer = res[i];
-                table +=  `<tr id="row_${i}"><td>${customer.id}</td><td>${customer.first_name}</td><td>${customer.last_name}</td><td>${customer.email}</td><td>${customer.address}</td><td>${customer.active}</td></tr>`;
+                table +=  `<tr id="row_${i}"><td>${customer.id}</td><td>${customer.first_name}</td><td>${customer.last_name}</td><td>${customer.email}</td><td>${customer.address}</td><td>${customer.active}</td><td>${customer.salt}</td><td>${customer.password}</td></tr>`;
                 if (i == 0) {
                     firstCustomer = customer;
                 }
