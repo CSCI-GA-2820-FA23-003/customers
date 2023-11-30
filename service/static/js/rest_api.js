@@ -157,6 +157,33 @@ $(function () {
     });
 
     // ****************************************
+    // Deactivate a Customer
+    // ****************************************
+
+    $("#deactivate-btn").click(function () {
+
+        let customer_id = $("#customer_id").val();
+
+        $("#flash_message").empty();
+
+        let ajax = $.ajax({
+            type: "PUT",
+            url: `/customers/${customer_id}/deactivate`,
+            contentType: "application/json",
+            data: '',
+        })
+
+        ajax.done(function(res){
+            clear_form_data()
+            flash_message("Customer has been Deactivated!")
+        });
+
+        ajax.fail(function(res){
+            flash_message("Server error!")
+        });
+    });
+
+    // ****************************************
     // Delete a Customer
     // ****************************************
 

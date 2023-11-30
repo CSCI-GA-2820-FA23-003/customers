@@ -15,7 +15,6 @@ Scenario: The server is running
     Then I should see "Customer RESTful Service" in the title
     And I should not see "404 Not Found"
 
-
 Scenario: Read a Customer
     When I visit the "Home Page"
     And I set the "Email" to "will.dixon@hotmail.com"
@@ -61,6 +60,7 @@ Scenario: Create a Customer
     And the "Address" field should be empty
     And the "Salt" field should be empty
     And the "Password" field should be empty
+    And the "Active" field should be empty
     When I paste the "Id" field
     And I press the "Retrieve" button
     Then I should see the message "Success"
@@ -79,7 +79,6 @@ Scenario: List all Customers
     And I should see "William" in the results
     And I should see "Jonathan" in the results
     And I should see "Megan" in the results
-
 
 Scenario: Update a Customer
     When I visit the "Home Page"
@@ -103,6 +102,35 @@ Scenario: Update a Customer
     And I should see "Olivia" in the results
     And I should not see "Jonathan" in the results
 
+Scenario: Deactivate a Customer
+    When I visit the "Home Page"
+    And I set the "Email" to "jrich@yahoo.com"
+    And I press the "Search" button
+    Then I should see the message "Success"
+    And I should see "True" in the "Active" dropdown
+    When I press the "Deactivate" button
+    Then I should see the message "Customer has been Deactivated!"
+    When I copy the "Id" field
+    And I press the "Clear" button
+    Then the "Id" field should be empty
+    And the "First Name" field should be empty
+    And the "Last Name" field should be empty
+    And the "Email" field should be empty
+    And the "Address" field should be empty
+    And the "Salt" field should be empty
+    And the "Password" field should be empty
+    And the "Active" field should be empty
+    When I paste the "Id" field
+    And I press the "Retrieve" button
+    Then I should see the message "Success"
+    And I should see "Jonathan" in the "First Name" field
+    And I should see "Richard" in the "Last Name" field
+    And I should see "jrich@yahoo.com" in the "Email" field
+    And I should see "778 Brown Plaza\nNorth Jenniferfurt, VT 88077" in the "Address" field
+    And I should see "6edcc0329c89cb56c6ddfb4dfe451887" in the "Salt" field
+    And I should see "4f1b60f3fea4f90aacd277108bc646efd7e99ac6590cae4d643da49cc72d174a" in the "Password" field
+    And I should see "False" in the "Active" dropdown
+
 Scenario: Delete a Customer
     When I visit the "Home Page"
     And I set the "Email" to "mchang@gmail.com"
@@ -117,6 +145,7 @@ Scenario: Delete a Customer
     And the "Address" field should be empty
     And the "Salt" field should be empty
     And the "Password" field should be empty
+    And the "Active" field should be empty
     When I paste the "Id" field
     And I press the "Delete" button
     Then I should see the message "Customer has been Deleted!"
