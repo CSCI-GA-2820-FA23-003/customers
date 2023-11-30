@@ -183,11 +183,11 @@ def step_impl(context, element_name, text_string):
 ##################################################################
 
 
-@when('I press the "Search" button')
-def step_impl(context):
-    select_element = context.driver.find_element(By.ID, "active_dropdown")
-    selected_option = Select(select_element).first_selected_option.text
-    print(f"Selected option in 'Active' dropdown: {selected_option}")
+# @when('I press the "Search" button')
+# def step_impl(context):
+#     select_element = context.driver.find_element(By.ID, "active_dropdown")
+#     selected_option = Select(select_element).first_selected_option.text
+#     print(f"Selected option in 'Active' dropdown: {selected_option}")
 
-    button_id = "search_button"
-    context.driver.find_element(By.ID, button_id).click()
+#     button_id = "search_button"
+#     context.driver.find_element(By.ID, button_id).click()
