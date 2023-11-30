@@ -80,6 +80,19 @@ Scenario: List all Customers
     And I should see "Jonathan" in the results
     And I should see "Megan" in the results
 
+Scenario: Query a Customer by email
+    When I visit the "Home Page"
+    And I set the "Email" to "will.dixon@hotmail.com"
+    And I press the "Search" button
+    Then I should see the message "Success"
+    And I should see "William" in the "First Name" field
+    And I should see "Dixon" in the "Last Name" field
+    And I should see "will.dixon@hotmail.com" in the "Email" field
+    And I should see "PSC 4115, Box 7815\nAPO AA 41945" in the "Address" field
+    And I should see "6edcc0329c89cb56c6ddfb4dfe451887" in the "Salt" field
+    And I should see "4f1b60f3fea4f90aacd277108bc646efd7e99ac6590cae4d643da49cc72d174a" in the "Password" field
+    And I should see "True" in the "Active" dropdown
+
 Scenario: Update a Customer
     When I visit the "Home Page"
     And I set the "Email" to "jrich@yahoo.com"

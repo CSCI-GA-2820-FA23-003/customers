@@ -133,7 +133,10 @@ def step_impl(context, name):
 @then('I should not see "{name}" in the results')
 def step_impl(context, name):
     element = context.driver.find_element(By.ID, "search_results")
-    assert name not in element.text
+    print("Actual text in search_results:", element.text)
+    assert (
+        name not in element.text
+    ), f"Expected not to see '{name}' in the results, but it appeared."
 
 
 @then('I should see the message "{message}"')
@@ -173,3 +176,18 @@ def step_impl(context, element_name, text_string):
     )
     element.clear()
     element.send_keys(text_string)
+
+
+##################################################################
+# This code works for the Active Dropdown filter when query.
+##################################################################
+
+
+# @when('I press the "Search" button')
+# def step_impl(context):
+#     select_element = context.driver.find_element(By.ID, "active_dropdown")
+#     selected_option = Select(select_element).first_selected_option.text
+#     print(f"Selected option in 'Active' dropdown: {selected_option}")
+
+#     button_id = "search_button"
+#     context.driver.find_element(By.ID, button_id).click()
