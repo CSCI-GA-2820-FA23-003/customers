@@ -1,15 +1,22 @@
 """
-My Service
+Customer Service with Swagger
 
-Describe what your service does here
+Paths:
+------
+GET / - Displays a UI for Selenium testing
+GET /customers - Returns a list all of the Customers
+GET /customers/{id} - Returns the Customer with a given id number
+POST /customers - creates a new Customer record in the database
+PUT /customers/{id} - updates a Customer record in the database
+DELETE /customers/{id} - deletes a Customer record in the database
 """
 
-from flask import jsonify, request, url_for, abort, json
+from flask_restx import Resource, fields, reqparse
 from service.common import status  # HTTP Status Codes
-from service.models import Customer, DataValidationError
+from service.models import Customer
 
 # Import Flask application
-from . import app
+from . import app, api
 
 
 ############################################################
@@ -23,7 +30,7 @@ def health():
     Returns:
         A JSON response indicating the health status with HTTP_200_OK.
     """
-    return jsonify({"status": "OK"}), status.HTTP_200_OK
+    return {"status": "OK"}, status.HTTP_200_OK
 
 
 ######################################################################
@@ -35,145 +42,214 @@ def index():
     return app.send_static_file("index.html")
 
 
+# Define the model so that the docs reflect what can be sent
+create_model = api.model(
+    "Customer",
+    {
+        "first_name": fields.String(
+            required=True, description="The first name of the Customer"
+        ),
+        "last_name": fields.String(
+            required=True, description="The last name of the Customer"
+        ),
+        "email": fields.String(required=True, description="The email of the Customer"),
+        "address": fields.String(
+            required=True, description="The address of the Customer"
+        ),
+        "salt": fields.String(required=True, description="The salt of the Customer"),
+        "password": fields.String(
+            required=True, description="The password of the Customer"
+        ),
+        "active": fields.Boolean(required=True, description="Is the Customer active?"),
+    },
+)
+
+customer_model = api.inherit(
+    "CustomerModel",
+    create_model,
+    {
+        "id": fields.String(
+            readOnly=True, description="The unique id assigned internally by service"
+        ),
+    },
+)
+
+# query string arguments
+customer_args = reqparse.RequestParser()
+customer_args.add_argument(
+    "email",
+    type=str,
+    location="args",
+    required=False,
+    help="Search a Customer by email",
+)
+
+
 ######################################################################
-#  R E S T   A P I   E N D P O I N T S
+#  PATH: /customers/{id}
 ######################################################################
-@app.route("/customers/<int:customer_id>", methods=["DELETE"])
-def delete_customer(customer_id):
+@api.route("/customers/<int:customer_id>")
+@api.param("customer_id", "The Customer identifier")
+class CustomerResource(Resource):
     """
-    Delete a Customer
+    CustomerResource class
 
-    This endpoint will delete a Customer based the id specified in the path
-    """
-    app.logger.info("Request to delete customer with id: %s", customer_id)
-    customer = Customer.find(customer_id)
-    if customer:
-        customer.delete()
-    app.logger.info("Customer with ID [%s] delete complete.", customer_id)
-    return "", status.HTTP_204_NO_CONTENT
-
-
-@app.route("/customers", methods=["POST"])
-def create_customer():
-    """
-    Creates a Customer
-    This endpoint will create a Customer based the data in the body that is posted
+    Allows the manipulation of a single Customer
+    GET /customer{id} - Returns a Customer with the id
+    PUT /customer{id} - Update a Customer with the id
+    DELETE /customer{id} -  Deletes a Customer with the id
     """
 
-    # Ensure the request contains JSON data
-    app.logger.info("Request to create a customer")
-    check_content_type("application/json")
+    # ------------------------------------------------------------------
+    # RETRIEVE A CUSTOMER
+    # ------------------------------------------------------------------
+    @api.doc("get_customers")
+    @api.response(404, "Customer not found")
+    @api.marshal_with(customer_model)
+    def get(self, customer_id):
+        """
+        Retrieve a single Customer
 
-    # Get the JSON data from the request
-    data = request.get_json()
+        This endpoint will return a Customer based on its id
+        """
+        app.logger.info("Request to Retrieve a customer with id [%s]", customer_id)
+        customer = Customer.find(customer_id)
+        if not customer:
+            abort(
+                status.HTTP_404_NOT_FOUND,
+                f"Customer with id '{customer}' was not found.",
+            )
 
-    # # Ensure all required fields are in the data
-    # required_fields = ["first_name", "last_name", "email", "address"]
-    # for field in required_fields:
-    #     if field not in data:
-    #         return jsonify({"error": f"'{field}' is a required field"}), status.HTTP_400_BAD_REQUEST
+        return customer.serialize(), status.HTTP_200_OK
 
-    # Create a new Customer with the data
-    try:
-        customer = Customer()
+    # ------------------------------------------------------------------
+    # UPDATE AN EXISTING CUSTOMER
+    # ------------------------------------------------------------------
+    @api.doc("update_customers")
+    @api.response(404, "Customer not found")
+    @api.response(400, "The posted Customer data was not valid")
+    @api.expect(customer_model)
+    @api.marshal_with(customer_model)
+    def put(self, customer_id):
+        """
+        Update a Customer
+
+        This endpoint will update a Customer based on the body that is posted
+        """
+        app.logger.info("Request to Update a customer with id [%s]", customer_id)
+        customer = Customer.find(customer_id)
+        if not customer:
+            abort(
+                status.HTTP_404_NOT_FOUND,
+                f"Customer with id '{customer_id}' was not found.",
+            )
+        app.logger.debug("Payload = %s", api.payload)
+        data = api.payload
         customer.deserialize(data)
+        customer.id = customer_id
+        customer.update()
+        return customer.serialize(), status.HTTP_200_OK
+
+    # ------------------------------------------------------------------
+    # DELETE A CUSTOMER
+    # ------------------------------------------------------------------
+    @api.doc("delete_customers")
+    @api.response(204, "Customer deleted")
+    def delete(self, customer_id):
+        """
+        Delete a Customer
+
+        This endpoint will delete a Customer based on the id specified in the path
+        """
+        app.logger.info("Request to Delete a customer with id [%s]", customer_id)
+        customer = Customer.find(customer_id)
+        if customer:
+            customer.delete()
+            app.logger.info("Customer with id [%s] was deleted", customer_id)
+
+        return "", status.HTTP_204_NO_CONTENT
+
+
+######################################################################
+#  PATH: /customers
+######################################################################
+@api.route("/customers", strict_slashes=False)
+class CustomerCollection(Resource):
+    """Handles all interactions with collections of Customers"""
+
+    # ------------------------------------------------------------------
+    # LIST ALL CUSTOMERS
+    # ------------------------------------------------------------------
+    @api.doc("list_customers")
+    @api.expect(customer_args, validate=True)
+    @api.marshal_list_with(customer_model)
+    def get(self):
+        """Returns all of the Customers"""
+        app.logger.info("Request to list Customers...")
+        customers = []
+        args = customer_args.parse_args()
+        if args["email"]:
+            app.logger.info("Filtering by email: %s", args["email"])
+            customers = Customer.find_by_email(args["email"])
+        else:
+            app.logger.info("Returning unfiltered list.")
+            customers = Customer.all()
+
+        results = [customer.serialize() for customer in customers]
+        app.logger.info("[%s] Customers returned", len(results))
+        return results, status.HTTP_200_OK
+
+    # ------------------------------------------------------------------
+    # ADD A NEW CUSTOMER
+    # ------------------------------------------------------------------
+    @api.doc("create_customers")
+    @api.response(400, "The posted data was not valid")
+    @api.expect(create_model)
+    @api.marshal_with(customer_model, code=201)
+    def post(self):
+        """
+        Creates a Customer
+        This endpoint will create a Customer based on the data in the body that is posted
+        """
+        app.logger.info("Request to Create a Customer")
+        customer = Customer()
+        app.logger.debug("Payload = %s", api.payload)
+        customer.deserialize(api.payload)
         customer.create()
-    except DataValidationError as error:
-        return jsonify({"error": str(error)}), status.HTTP_400_BAD_REQUEST
-
-    location_url = url_for("get_customer", customer_id=customer.id, _external=True)
-    app.logger.info("Customer with ID [%s] created.", customer.id)
-
-    # Return the new Customer as JSON
-    return (
-        jsonify(customer.serialize()),
-        status.HTTP_201_CREATED,
-        {"Location": location_url},
-    )
-
-
-@app.route("/customers/<int:customer_id>", methods=["GET"])
-def get_customer(customer_id):
-    """
-    Get a Customer
-
-    This endpoint will get a Customer information based the id specified in the path
-    """
-    customer = Customer.find(customer_id)
-    if not customer:
-        abort(status.HTTP_404_NOT_FOUND, f"Customer Id: '{customer_id}' was not found.")
-
-    app.logger.info("Customer with ID [%s] get.", customer_id)
-    return jsonify(customer.serialize()), status.HTTP_200_OK
-
-
-@app.route("/customers", methods=["GET"])
-def list_customers():
-    """
-    List all Customers
-
-    This endpoint will retrieve and return a list of all customers
-    """
-    app.logger.info("Request to list all customers")
-    customers = []
-    email = request.args.get("email")
-    if email:
-        customers = Customer.find_by_email(email)
-    else:
-        customers = Customer.all()
-
-    results = [customer.serialize() for customer in customers]
-    app.logger.info("Returning %d customers", len(results))
-    return jsonify(results), status.HTTP_200_OK
-
-
-@app.route("/customers/<int:customer_id>", methods=["PUT"])
-def update_customer(customer_id):
-    """
-    Update a Customer
-
-    This endpoint will update a Customer based on the data in the body that is put
-    """
-    app.logger.info("Request to update customer with id: %s", customer_id)
-
-    check_content_type("application/json")
-
-    existing_customer = Customer.find(customer_id)
-    if not existing_customer:
-        abort(status.HTTP_404_NOT_FOUND, f"Customer Id: '{customer_id}' was not found.")
-
-    updated_data = request.get_json()
-
-    app.logger.info(
-        "Updating customer with ID [%s]. New data: %s",
-        customer_id,
-        json.dumps(updated_data, indent=2),
-    )
-
-    existing_customer.deserialize(updated_data)
-    existing_customer.update()
-
-    app.logger.info("Customer with ID [%s] updated.", customer_id)
-    return jsonify(existing_customer.serialize()), status.HTTP_200_OK
-
-
-######################################################################
-# DEACTIVATE A CUSTOMER
-######################################################################
-@app.route("/customers/<int:customer_id>/deactivate", methods=["PUT"])
-def deactivate_customer(customer_id):
-    """Deactivate a Customer"""
-    customer = Customer.find(customer_id)
-    if not customer:
-        abort(
-            status.HTTP_404_NOT_FOUND,
-            f"Customer with id '{customer_id}' was not found.",
+        app.logger.info("Customer with new id [%s] created!", customer.id)
+        location_url = api.url_for(
+            CustomerResource, customer_id=customer.id, _external=True
         )
+        return customer.serialize(), status.HTTP_201_CREATED, {"Location": location_url}
 
-    customer.active = False
-    customer.update()
 
-    return customer.serialize(), status.HTTP_200_OK
+######################################################################
+#  PATH: /customers/{id}/deactivate
+######################################################################
+@api.route("/customers/<customer_id>/deactivate")
+@api.param("customer_id", "The Customer identifier")
+class DeactivateResource(Resource):
+    """Deactivate actions on a Customer"""
+
+    @api.doc("deactivate_customers")
+    @api.response(404, "Customer not found")
+    def put(self, customer_id):
+        """
+        Deactivate a Customer
+
+        This endpoint will deactivate a Customer
+        """
+        app.logger.info("Request to Deactivate a Customer")
+        customer = Customer.find(customer_id)
+        if not customer:
+            abort(
+                status.HTTP_404_NOT_FOUND,
+                f"Customer with id [{customer_id}] was not found.",
+            )
+        customer.active = False
+        customer.update()
+        app.logger.info("Customer with id [%s] has been deactivated!", customer.id)
+        return customer.serialize(), status.HTTP_200_OK
 
 
 ######################################################################
@@ -181,20 +257,7 @@ def deactivate_customer(customer_id):
 ######################################################################
 
 
-def check_content_type(content_type):
-    """Checks that the media type is correct"""
-    if "Content-Type" not in request.headers:
-        app.logger.error("No Content-Type specified.")
-        abort(
-            status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
-            f"Content-Type must be {content_type}",
-        )
-
-    if request.headers["Content-Type"] == content_type:
-        return
-
-    app.logger.error("Invalid Content-Type: %s", request.headers["Content-Type"])
-    abort(
-        status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
-        f"Content-Type must be {content_type}",
-    )
+def abort(error_code: int, message: str):
+    """Logs errors before aborting"""
+    app.logger.error(message)
+    api.abort(error_code, message)
