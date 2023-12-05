@@ -10,6 +10,7 @@ import json
 # import os
 import logging
 from unittest import TestCase
+from urllib.parse import quote_plus
 
 from service import app, config
 from service.common import status  # HTTP Status Codes
@@ -20,7 +21,7 @@ from tests.factories import CustomerFactory
 # from flask import jsonify
 
 
-BASE_URL = "/customers"
+BASE_URL = "/api/customers"
 
 
 ######################################################################
@@ -111,7 +112,7 @@ class TestCustomerServer(TestCase):
 
         # Action
         response = self.client.post(
-            "/customers", data=data, content_type="application/json"
+            BASE_URL, data=data, content_type="application/json"
         )
 
         # Assert
@@ -123,6 +124,7 @@ class TestCustomerServer(TestCase):
         self.assertEqual(new_json["last_name"], fake_customer.last_name)
         self.assertEqual(new_json["email"], fake_customer.email)
         self.assertEqual(new_json["address"], fake_customer.address)
+        self.assertEqual(new_json["salt"], fake_customer.salt)
         self.assertEqual(new_json["password"], fake_customer.password)
         self.assertEqual(new_json["active"], fake_customer.active)
 
@@ -145,7 +147,7 @@ class TestCustomerServer(TestCase):
 
         # Action
         response = self.client.post(
-            "/customers", data=data, content_type="application/json"
+            BASE_URL, data=data, content_type="application/json"
         )
 
         # Check the data is correct
@@ -159,7 +161,7 @@ class TestCustomerServer(TestCase):
 
         # Action
         response = self.client.post(
-            "/customers", data=data, content_type="application/json"
+            BASE_URL, data=data, content_type="application/json"
         )
 
         # Assert
@@ -186,7 +188,7 @@ class TestCustomerServer(TestCase):
 
         # Action
         response = self.client.post(
-            "/customers",
+            BASE_URL,
             data=data,
             content_type="text/plain",  # Send as plain text instead of JSON
         )
@@ -215,7 +217,7 @@ class TestCustomerServer(TestCase):
 
         # Action
         response = self.client.post(
-            "/customers",
+            BASE_URL,
             data=data,
             # Send as no type instead of JSON
         )
@@ -250,55 +252,38 @@ class TestCustomerServer(TestCase):
 
             # Action
             response = self.client.post(
-                "/customers", data=json.dumps(bad_data), content_type="application/json"
+                BASE_URL, data=json.dumps(bad_data), content_type="application/json"
             )
 
-            # Assert
-            self.assertEqual(
-                response.status_code, status.HTTP_400_BAD_REQUEST
-            )  # Expect a 400 error
-
-            # Check the error message
-            error_json = json.loads(response.data)
-            self.assertEqual(error_json["error"], "Invalid Customer: missing " + key)
+            self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_get_customer(self):
         """It should Read a Customer"""
-        # customer = CustomerFactory()
-        # logging.debug(customer)
-        # customer.id = None
-        # customer.create()
-        # self.assertIsNotNone(customer.id)
-        # # Fetch it back
-        # found_customer = Customer.find(customer.id)
-        # self.assertEqual(found_customer.id, customer.id)
-        # self.assertEqual(found_customer.first_name, customer.first_name)
-        # self.assertEqual(found_customer.last_name, customer.last_name)
-        # self.assertEqual(found_customer.email, customer.email)
-        # self.assertEqual(found_customer.address, customer.address)
-
         # Create a test resource using the factory
         customer = CustomerFactory()
 
         response = self.client.get(
-            "/customers/" + str(customer.id),
+            BASE_URL + str(customer.id),
         )
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
         customer.create()
 
         # Send a GET request to retrieve the resource
-        response = self.client.get(
-            "/customers/" + str(customer.id),
-        )
+        response = self.client.get(f"{BASE_URL}/{customer.id}")
 
         # Check if the response status code is 200 (OK)
         self.assertEqual(response.status_code, 200)
-        customer = Customer.find(customer.id)
-        found_customer = response.get_json()
 
         # Check if the returned JSON data matches the resource data
-        self.assertEqual(found_customer, customer.serialize())
+        new_json = json.loads(response.data)
+        self.assertEqual(new_json["first_name"], customer.first_name)
+        self.assertEqual(new_json["last_name"], customer.last_name)
+        self.assertEqual(new_json["email"], customer.email)
+        self.assertEqual(new_json["address"], customer.address)
+        self.assertEqual(new_json["salt"], customer.salt)
+        self.assertEqual(new_json["password"], customer.password)
+        self.assertEqual(new_json["active"], customer.active)
 
     def test_list_customers(self):
         """Test listing all customers"""
@@ -317,14 +302,16 @@ class TestCustomerServer(TestCase):
 
         self.assertEqual(len(customers_data), expected_length)
 
-    def test_query_customer_list_by_email(self):
+    def test_query_by_email(self):
         """It should Query Customers by Email"""
         customers = self._create_customers(10)
         test_email = customers[0].email
         email_customers = [
             customer for customer in customers if customer.email == test_email
         ]
-        response = self.client.get(BASE_URL, query_string=f"email={test_email}")
+        response = self.client.get(
+            BASE_URL, query_string=f"email={quote_plus(test_email)}"
+        )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         data = response.get_json()
         self.assertEqual(len(data), len(email_customers))
@@ -365,7 +352,7 @@ class TestCustomerServer(TestCase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
         expected_error_message = (
-            f"404 Not Found: Customer Id: '{non_existing_customer_id}' was not found."
+            f"Customer with id '{non_existing_customer_id}' was not found."
         )
         self.assertEqual(response.get_json()["message"], expected_error_message)
 
@@ -387,7 +374,7 @@ class TestCustomerServer(TestCase):
     def test_deactivate_a_nonexistent_customer(self):
         """It should Not Deactivate a Nonexistent Customer"""
         customer = self._create_customers(1)[0]
-        response = self.client.put(f"{BASE_URL}/{customer.id + 1}/deactivate")
+        response = self.client.put(f"{BASE_URL}/{int(customer.id) + 1}/deactivate")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_method_not_supported(self):

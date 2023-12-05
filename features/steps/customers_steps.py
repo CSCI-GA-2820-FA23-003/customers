@@ -36,7 +36,7 @@ def step_impl(context):
     """Delete all Customers and load new ones"""
 
     # List all of the customers and delete them one by one
-    rest_endpoint = f"{context.base_url}/customers"
+    rest_endpoint = f"{context.base_url}/api/customers"
     context.resp = requests.get(rest_endpoint)
     assert context.resp.status_code == HTTP_200_OK
     for customer in context.resp.json():
@@ -52,7 +52,7 @@ def step_impl(context):
             "address": row["address"],
             "active": row["active"] in ["True", "true", "1"],
             "salt": row["salt"],
-            "password": row["password"]
+            "password": row["password"],
         }
         context.resp = requests.post(rest_endpoint, json=payload)
         assert context.resp.status_code == HTTP_201_CREATED
