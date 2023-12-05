@@ -50,16 +50,19 @@ tar xvzf tkn_0.18.0_Linux_$ARCH.tar.gz -C /usr/local/bin/ tkn
 ln -s /usr/local/bin/tkn /usr/bin/tkn
 
 echo "**********************************************************************"
-echo "Installing Tekton CLI..."
+echo "Install OpenShift 4 CLI..."
 echo "**********************************************************************"
+# OpenShift CLI has platform specific installs
 if [ $ARCH == amd64 ]; then
-    curl -LO https://github.com/tektoncd/cli/releases/download/v0.32.2/tkn_0.32.2_Linux_x86_64.tar.gz
-	sudo tar xvzf tkn_0.32.2_Linux_x86_64.tar.gz -C /usr/local/bin/ tkn
+    echo "Installing OpenShift for Intel..."
+    curl https://mirror.openshift.com/pub/openshift-v4/clients/ocp/stable/openshift-client-linux.tar.gz --output oc.tar.gz
 else
-    curl -LO https://github.com/tektoncd/cli/releases/download/v0.32.2/tkn_0.32.2_Linux_aarch64.tar.gz
-	sudo tar xvzf tkn_0.32.2_Linux_aarch64.tar.gz -C /usr/local/bin/ tkn
-	rm tkn_0.32.2_Linux_aarch64.tar.gz
+    echo "Installing OpenShift for $ARCH ..."
+    curl https://mirror.openshift.com/pub/openshift-v4/clients/ocp/stable/openshift-client-linux-$ARCH.tar.gz --output oc.tar.gz
 fi;
+sudo tar xvzf oc.tar.gz -C /usr/local/bin/ oc
+sudo ln -s /usr/local/bin/oc /usr/bin/oc
+rm oc.tar.gz
 
 echo "**********************************************************************"
 echo "TOOLS INSTALLATION COMPLETE !!!"
