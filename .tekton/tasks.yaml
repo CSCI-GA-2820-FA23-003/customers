@@ -146,7 +146,6 @@ spec:
     - name: BASE_URL
       description: The url that behave will interact with
       type: string
-      default: $(params.BASE_URL)
   steps:
     - name: behave
       image: rofrano/pipeline-selenium:latest
@@ -162,6 +161,7 @@ spec:
       script: |
         #!/bin/bash
         set -e
+        echo $PATH
         echo $(params.BASE_URL)
 
         echo "***** Installing dependencies *****"
