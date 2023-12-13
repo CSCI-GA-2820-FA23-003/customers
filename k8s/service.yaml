@@ -3,11 +3,13 @@ kind: Service
 metadata:
   name: customer
 spec:
-  type: LoadBalancer
+  # type: LoadBalancer
   selector:
     app: customer
+  type: ClusterIP
+  internalTrafficPolicy: Cluster
   ports:
     - name: primary
       protocol: TCP
-      port: 80
+      port: 8080
       targetPort: 8080

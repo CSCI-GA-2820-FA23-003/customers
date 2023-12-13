@@ -1,12 +1,15 @@
-FROM python:3.11-slim
+##################################################
+# Create production image
+##################################################
+FROM quay.io/rofrano/python:3.11-slim
 
 # Create working folder and install dependencies
 WORKDIR /app
 COPY requirements.txt .
 RUN apt-get update \
     && apt-get install -y libpq-dev gcc \
-    && pip install --no-cache-dir -r requirements.txt \
-    && pip install psycopg2-binary
+    && pip install -U pip wheel \
+    && pip install --no-cache-dir -r requirements.txt
 
 # Copy the application contents
 COPY service/ ./service/
