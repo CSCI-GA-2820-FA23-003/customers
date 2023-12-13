@@ -15,8 +15,8 @@ spec:
         app: customer
     spec:
       restartPolicy: Always
-      imagePullSecrets:
-        - name: postgres-creds
+      # imagePullSecrets:
+      #   - name: postgres-creds
       containers:
         - name: customer
           image: cluster-registry:32000/customer:1.0
