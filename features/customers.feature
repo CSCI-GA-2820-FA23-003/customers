@@ -162,3 +162,13 @@ Scenario: Delete a Customer
     When I paste the "Id" field
     And I press the "Delete" button
     Then I should see the message "Customer has been Deleted!"
+    
+    When I set the "Email" to "will.dixon@hotmail.com"
+    And I press the "Search" button
+    And I press the "Delete" button
+    And I set the "Email" to "jrich@yahoo.com"
+    And I press the "Search" button
+    And I press the "Delete" button
+    And I press the "Search" button
+    Then I should not see "William" in the results
+    And I should not see "Jonathan" in the results
