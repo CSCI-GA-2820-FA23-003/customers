@@ -143,6 +143,9 @@ spec:
       description: The name of the key that contains the database uri
       type: string
       default: "database_uri"
+    - name: BASE_URL
+      description: The url that behave will interact with
+      type: string
   steps:
     - name: behave
       image: rofrano/pipeline-selenium:latest
@@ -160,12 +163,6 @@ spec:
         echo "***** Installing dependencies *****"
         python -m pip install --upgrade pip wheel
         pip install -qr requirements.txt
-
-        echo "\n*** STARTING APPLICATION ***\n"
-        gunicorn --log-level=critical --bind=0.0.0.0:8000 service:app &
-        sleep 5
-        curl -i http://localhost:8000/health
-        echo "\n*** SERVER IS RUNNING ***"
 
         echo "***** Running Tests *****"
         behave
