@@ -162,10 +162,10 @@ spec:
         pip install -qr requirements.txt
 
         echo "\n*** STARTING APPLICATION ***\n"
-          gunicorn --log-level=critical --bind=0.0.0.0:8000 service:app &
-          sleep 5
-          curl -i http://localhost:8000/health
-          echo "\n*** SERVER IS RUNNING ***"
+        gunicorn --log-level=critical --bind=0.0.0.0:8000 service:app &
+        sleep 5
+        curl -i http://localhost:8000/health
+        echo "\n*** SERVER IS RUNNING ***"
 
         echo "***** Running Tests *****"
         behave
