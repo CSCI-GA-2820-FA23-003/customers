@@ -16,7 +16,7 @@ spec:
     spec:
       restartPolicy: Always
       imagePullSecrets:
-        - name: my-secret
+        - name: postgres-creds
       containers:
         - name: customer
           image: cluster-registry:32000/customer:1.0
@@ -28,8 +28,8 @@ spec:
             - name: DATABASE_URI
               valueFrom:
                 secretKeyRef:
-                  name: my-secret
-                  key: uri
+                  name: postgres-creds
+                  key: database_uri
           resources:
             limits:
               cpu: "0.25"
