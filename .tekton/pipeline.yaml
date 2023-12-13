@@ -15,6 +15,20 @@ spec:
       description: Arguments for green testing
       name: GREEN_ARGS
       type: string
+    - default: customers
+      description: Name of the application
+      name: APP_NAME
+      type: string
+    - default: >-
+        image-registry.openshift-image-registry.svc:5000/$(context.pipelineRun.namespace)/$(params.APP_NAME):latest
+      description: The name of the image to build
+      name: IMAGE_NAME
+      type: string
+    - default: >-
+        https://customers-elien2016-dev.apps.sandbox-m2.ll9k.p1.openshiftapps.com/
+      description: The url that behave will interact with
+      name: BASE_URL
+      type: string
   tasks:
     - name: git-clone
       params:
