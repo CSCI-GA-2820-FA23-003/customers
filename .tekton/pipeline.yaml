@@ -141,5 +141,19 @@ spec:
       workspaces:
         - name: source
           workspace: pipeline-workspace
+    - name: bdd
+      params:
+        - name: SECRET_NAME
+          value: postgres-creds
+        - name: SECRET_KEY
+          value: database_uri
+      runAfter:
+        - deploy-image
+      taskRef:
+        kind: Task
+        name: bdd
+      workspaces:
+        - name: source
+          workspace: pipeline-workspace
   workspaces:
     - name: pipeline-workspace
