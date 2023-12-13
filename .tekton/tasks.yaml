@@ -116,6 +116,64 @@ spec:
 apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
+  name: bdd
+  labels:
+    app.kubernetes.io/version: "0.1"
+  annotations:
+    tekton.dev/categories: Testing
+    tekton.dev/pipelines.minVersion: "0.17.0"
+    tekton.dev/tags: python, behave
+    tekton.dev/displayName: "bdd tests"
+    tekton.dev/platforms: "linux/amd64"
+spec:
+  workspaces:
+    - name: source
+  description: >-
+    This task can be used to perform BDD tests with behave.
+
+    If you define a secret with the key `database_uri`
+    it will create an environment variable named DATABASE_URI
+    that can be used to connect to a test database.
+  params:
+    - name: SECRET_NAME
+      description: The name of the secret containing a database_uri key
+      type: string
+      default: "postgres-creds"
+    - name: SECRET_KEY
+      description: The name of the key that contains the database uri
+      type: string
+      default: "database_uri"
+  steps:
+    - name: behave
+      image: rofrano/pipeline-selenium:latest
+      workingDir: $(workspaces.source.path)
+      env:
+        - name: DATABASE_URI
+          valueFrom:
+            secretKeyRef:
+              name: $(params.SECRET_NAME)
+              key: $(params.SECRET_KEY)
+      script: |
+        #!/bin/bash
+        set -e
+
+        echo "***** Installing dependencies *****"
+        python -m pip install --upgrade pip wheel
+        pip install -qr requirements.txt
+
+        echo "\n*** STARTING APPLICATION ***\n"
+          gunicorn --log-level=critical --bind=0.0.0.0:8000 service:app &
+          sleep 5
+          curl -i http://localhost:8000/health
+          echo "\n*** SERVER IS RUNNING ***"
+
+        echo "***** Running Tests *****"
+        behave
+
+---
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
   name: apply-manifests
   labels:
     app.kubernetes.io/version: "0.1"
