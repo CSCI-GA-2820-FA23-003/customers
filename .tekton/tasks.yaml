@@ -161,8 +161,6 @@ spec:
       script: |
         #!/bin/bash
         set -e
-        echo $PATH
-        echo $(params.BASE_URL)
 
         echo "***** Installing dependencies *****"
         python -m pip install --upgrade pip wheel
