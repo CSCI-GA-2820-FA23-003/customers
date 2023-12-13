@@ -146,6 +146,7 @@ spec:
     - name: BASE_URL
       description: The url that behave will interact with
       type: string
+      default: $(params.BASE_URL)
   steps:
     - name: behave
       image: rofrano/pipeline-selenium:latest
@@ -156,6 +157,8 @@ spec:
             secretKeyRef:
               name: $(params.SECRET_NAME)
               key: $(params.SECRET_KEY)
+        - name: BASE_URL
+          value: $(params.BASE_URL)
       script: |
         #!/bin/bash
         set -e

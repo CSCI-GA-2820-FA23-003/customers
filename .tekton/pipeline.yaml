@@ -147,6 +147,8 @@ spec:
           value: postgres-creds
         - name: SECRET_KEY
           value: database_uri
+        - name: BASE_URL
+          value: $(params.BASE_URL)
       runAfter:
         - deploy-image
       taskRef:
