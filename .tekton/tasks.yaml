@@ -135,14 +135,6 @@ spec:
     it will create an environment variable named DATABASE_URI
     that can be used to connect to a test database.
   params:
-    - name: SECRET_NAME
-      description: The name of the secret containing a database_uri key
-      type: string
-      default: "postgres-creds"
-    - name: SECRET_KEY
-      description: The name of the key that contains the database uri
-      type: string
-      default: "database_uri"
     - name: BASE_URL
       description: The url that behave will interact with
       type: string
@@ -151,11 +143,6 @@ spec:
       image: rofrano/pipeline-selenium:latest
       workingDir: $(workspaces.source.path)
       env:
-        - name: DATABASE_URI
-          valueFrom:
-            secretKeyRef:
-              name: $(params.SECRET_NAME)
-              key: $(params.SECRET_KEY)
         - name: BASE_URL
           value: $(params.BASE_URL)
       script: |
